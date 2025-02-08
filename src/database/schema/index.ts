@@ -1,3 +1,6 @@
 import { users } from "./user";
+import { sessions } from "./sessions";
+import { accounts } from "./accounts";
 
-export { users };
+export { users, sessions, accounts };
+
