@@ -1,6 +1,6 @@
+import { accounts } from "./accounts";
 import { users } from "./user";
 import { sessions } from "./sessions";
-import { accounts } from "./accounts";
 
-export { users, sessions, accounts };
+export { accounts, users, sessions };
 

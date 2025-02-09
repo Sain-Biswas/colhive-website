@@ -44,9 +44,11 @@ export function SignupForm() {
 
   const registerUser = api.users.register.useMutation({
     onSuccess: async () => {
-      toast.success("User created successfully.");
+      toast.success("User created successfully.", {
+        description: "Please check your inbox to verify your email.",
+      });
     },
-    onError(error, variables, context) {
+    onError(error) {
       if (
         error.shape?.message ===
         "SQLITE_CONSTRAINT_UNIQUE: UNIQUE constraint failed: user.email"
@@ -117,7 +119,7 @@ export function SignupForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <div className="flex justify-center items-center border-input aria-invalid:outline-destructive/60 aria-invalid:ring-destructive/20 dark:aria-invalid:outline-destructive dark:aria-invalid:ring-destructive/50 ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 aria-invalid:outline-destructive/60 dark:aria-invalid:outline-destructive dark:aria-invalid:ring-destructive/40 aria-invalid:ring-destructive/20 aria-invalid:border-destructive/60 dark:aria-invalid:border-destructive h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] focus-within:ring-4 focus-within:outline-1 aria-invalid:focus-within:ring-[3px] aria-invalid:focus-within:outline-none md:text-sm dark:aria-invalid:focus-within:ring-4">
+                <div className="flex justify-center items-center border-input aria-invalid:outline-destructive/60 aria-invalid:ring-destructive/20 dark:aria-invalid:outline-destructive dark:aria-invalid:ring-destructive/50 ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 aria-invalid:border-destructive/60 dark:aria-invalid:border-destructive h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] focus-within:ring-4 focus-within:outline-1 aria-invalid:focus-within:ring-[3px] aria-invalid:focus-within:outline-none md:text-sm dark:aria-invalid:focus-within:ring-4">
                   <Input
                     placeholder="******"
                     type={showPassword ? "text" : "password"}

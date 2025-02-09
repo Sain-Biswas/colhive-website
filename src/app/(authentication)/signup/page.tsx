@@ -2,7 +2,7 @@ import { GalleryVerticalEndIcon } from "lucide-react";
 import Link from "next/link";
 import { SignupForm } from "./signup-form";
 
-export default function LoginPage() {
+export default function SignupPage() {
   return (
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="w-full max-w-sm">
@@ -10,7 +10,7 @@ export default function LoginPage() {
           <div className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2">
               <Link
-                href="/login"
+                href="/"
                 className="flex flex-col items-center gap-2 font-medium"
               >
                 <div className="flex size-8 items-center justify-center rounded-md">
@@ -21,12 +21,12 @@ export default function LoginPage() {
               <h1 className="text-xl font-bold">Welcome to Colhive</h1>
               <div className="text-center text-sm">
                 already have an account?{" "}
-                <a
-                  href="#"
+                <Link
+                  href="/login"
                   className="underline underline-offset-4"
                 >
                   Log in
-                </a>
+                </Link>
               </div>
             </div>
           </div>
