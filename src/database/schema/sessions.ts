@@ -10,8 +10,4 @@ export const sessions = sqliteTable("session", {
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),
-  updatedAt: integer("createdAt", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
-    .$onUpdateFn(() => new Date()),
 });
-

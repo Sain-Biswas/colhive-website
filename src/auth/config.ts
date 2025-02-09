@@ -3,12 +3,14 @@ import {
   type DefaultSession,
   type NextAuthConfig,
 } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/database";
 import { accounts, sessions, users } from "@/database/schema";
-import Credentials from "next-auth/providers/credentials";
-import { compareSync } from "bcryptjs";
 import { eq } from "drizzle-orm";
+
+import { compareSync } from "bcryptjs";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -23,69 +25,68 @@ declare module "next-auth" {
   // }
 }
 
+const adapter = DrizzleAdapter(db, {
+  usersTable: users,
+  accountsTable: accounts,
+  sessionsTable: sessions,
+});
+
 export const authConfig = {
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-  }),
+  adapter,
   providers: [
     Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
+      name: "Credentials",
       credentials: {
         email: {},
         password: {},
       },
       authorize: async (credentials) => {
-        try {
-          const user = await db.query.users.findFirst({
-            where: eq(users.email, credentials.email as string),
-          });
+        const user = await db.query.users.findFirst({
+          where: eq(users.email, credentials.email as string),
+        });
 
-          if (!user) {
-            throw new CredentialsSignin("User not registered.", {
-              name: "UserNotFoundError",
-            });
-          }
-
-          const isValidPassword = compareSync(
-            credentials.password as string,
-            user.password
-          );
-
-          if (!isValidPassword) {
-            throw new CredentialsSignin("Invalid Password", {
-              name: "PasswordError",
-            });
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            emailVerified: user.emailVerified,
-            name: user.name,
-            image: user.image,
-          };
-        } catch (error: any) {
-          throw new CredentialsSignin("Internal Server Error", {
-            name: "ServerError",
-          });
+        if (!user) {
+          throw new CredentialsSignin("UserNotFoundError");
         }
+
+        const isValidPassword = compareSync(
+          credentials.password as string,
+          user.password
+        );
+
+        if (!isValidPassword) {
+          throw new CredentialsSignin("PasswordError");
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          emailVerified: user.emailVerified,
+          name: user.name,
+          image: user.image,
+        };
       },
     }),
   ],
   callbacks: {
-    session: ({ session, user }) => ({
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id as string;
+      }
+
+      return token;
+    },
+    session: async ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id,
+        id: token.id as string,
       },
     }),
   },
   session: {
-    strategy: "database",
+    strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60,
   },
 } satisfies NextAuthConfig;
 
