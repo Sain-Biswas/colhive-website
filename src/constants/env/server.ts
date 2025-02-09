@@ -26,4 +26,3 @@ const envServer = createEnv({
 });
 
 export default envServer;
-

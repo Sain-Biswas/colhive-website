@@ -9,4 +9,3 @@ const envClient = createEnv({
 });
 
 export default envClient;
-

@@ -1,5 +1,7 @@
-import { GalleryVerticalEndIcon } from "lucide-react";
 import Link from "next/link";
+
+import { GalleryVerticalEndIcon } from "lucide-react";
+
 import { SignupForm } from "./signup-form";
 
 export default function SignupPage() {
@@ -21,10 +23,7 @@ export default function SignupPage() {
               <h1 className="text-xl font-bold">Welcome to Colhive</h1>
               <div className="text-center text-sm">
                 already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="underline underline-offset-4"
-                >
+                <Link href="/login" className="underline underline-offset-4">
                   Log in
                 </Link>
               </div>
@@ -40,4 +39,3 @@ export default function SignupPage() {
     </div>
   );
 }
-

@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",
@@ -27,6 +28,7 @@
     "@trpc/client": "11.0.0-rc.747",
     "@trpc/react-query": "11.0.0-rc.747",
     "@trpc/server": "11.0.0-rc.747",
+    "babel-plugin-react-compiler": "19.0.0-beta-714736e-20250131",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -49,6 +51,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@tailwindcss/postcss": "^4.0.4",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.17.17",
     "@types/react": "^19.0.8",
@@ -56,7 +59,10 @@
     "drizzle-kit": "^0.30.4",
     "eslint": "^9.20.0",
     "eslint-config-next": "15.1.6",
+    "eslint-config-prettier": "^10.0.1",
     "postcss": "^8.5.1",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwindcss": "^4.0.4",
     "typescript": "^5.7.3"
   }

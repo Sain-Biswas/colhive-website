@@ -1,12 +1,12 @@
-import { z } from "zod";
 import { hashSync } from "bcryptjs";
+import { z } from "zod";
 
+import { users } from "@/database/schema";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "@/server/trpc";
-import { users } from "@/database/schema";
 
 export const usersRouter = createTRPCRouter({
   register: publicProcedure
@@ -32,4 +32,3 @@ export const usersRouter = createTRPCRouter({
     return "you can now see this secret message!";
   }),
 });
-

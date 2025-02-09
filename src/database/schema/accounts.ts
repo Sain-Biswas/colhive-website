@@ -5,6 +5,7 @@ import {
   text,
 } from "drizzle-orm/sqlite-core";
 import type { AdapterAccountType } from "next-auth/adapters";
+
 import { users } from "./index";
 
 export const accounts = sqliteTable(
@@ -36,4 +37,3 @@ export const accounts = sqliteTable(
     }),
   })
 );
-

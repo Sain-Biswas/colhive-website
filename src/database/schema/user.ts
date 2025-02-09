@@ -16,4 +16,3 @@ export const users = sqliteTable("user", {
     .$defaultFn(() => new Date())
     .$onUpdateFn(() => new Date()),
 });
-
