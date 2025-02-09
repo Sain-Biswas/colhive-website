@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,6 +36,7 @@ const formSchema = z.object({
 
 export function SignupForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,6 +52,7 @@ export function SignupForm() {
       toast.success("User created successfully.", {
         description: "Please check your inbox to verify your email.",
       });
+      router.push("/login");
     },
     onError(error) {
       if (

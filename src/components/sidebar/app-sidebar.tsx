@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 import {
   AudioWaveform,
   BookOpen,
@@ -23,10 +21,10 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
-import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+import { NavMain } from "@/components/sidebar/nav-main";
+import { NavProjects } from "@/components/sidebar/nav-projects";
+import { NavUser } from "@/components/sidebar/nav-user";
+import { TeamSwitcher } from "@/components/sidebar/team-switcher";
 
 // This is sample data.
 const data = {
@@ -158,18 +156,32 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps {
+  user:
+    | {
+        image: string | null;
+        name: string;
+        id: string;
+        email: string | null;
+        emailVerified: Date | null;
+        createdAt: Date | null;
+        updatedAt: Date | null;
+      }
+    | undefined;
+}
+
+export function AppSidebar({ user }: AppSidebarProps) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon">
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

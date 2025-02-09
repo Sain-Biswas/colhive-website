@@ -1,4 +1,5 @@
 import { hashSync } from "bcryptjs";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { users } from "@/database/schema";
@@ -28,7 +29,28 @@ export const usersRouter = createTRPCRouter({
       });
     }),
 
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
+  currentUser: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    const user = await ctx.db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerified: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        activeOrganization: true,
+        password: false,
+      },
+    });
+
+    return user;
+  }),
+
+  deleteUser: protectedProcedure.mutation(async ({ ctx }) => {
+    await ctx.db.delete(users).where(eq(users.id, ctx.session.user.id));
   }),
 });
