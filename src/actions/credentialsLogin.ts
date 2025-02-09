@@ -1,7 +1,8 @@
 "use server";
 
-import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
+
+import { signIn } from "@/auth";
 
 export default async function credentialsLogin(
   email: string,
@@ -46,4 +47,3 @@ export default async function credentialsLogin(
     };
   }
 }
-

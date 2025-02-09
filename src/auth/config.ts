@@ -1,3 +1,6 @@
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { compareSync } from "bcryptjs";
+import { eq } from "drizzle-orm";
 import {
   CredentialsSignin,
   type DefaultSession,
@@ -5,12 +8,8 @@ import {
 } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/database";
 import { accounts, sessions, users } from "@/database/schema";
-import { eq } from "drizzle-orm";
-
-import { compareSync } from "bcryptjs";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -89,4 +88,3 @@ export const authConfig = {
     maxAge: 7 * 24 * 60 * 60,
   },
 } satisfies NextAuthConfig;
-

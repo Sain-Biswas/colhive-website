@@ -1,5 +1,13 @@
 "use client";
 
+import { useState } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,13 +18,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+
 import { api } from "@/trpc/trpc-react-provider";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
 
 const formSchema = z.object({
   name: z.string().min(1, "User name is required."),
@@ -76,10 +79,7 @@ export function SignupForm() {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-3"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
         <FormField
           control={form.control}
           name="name"
@@ -87,10 +87,7 @@ export function SignupForm() {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="First Middle Last"
-                  {...field}
-                />
+                <Input placeholder="First Middle Last" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -103,10 +100,7 @@ export function SignupForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="something@example.com"
-                  {...field}
-                />
+                <Input placeholder="something@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -119,15 +113,15 @@ export function SignupForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <div className="flex justify-center items-center border-input aria-invalid:outline-destructive/60 aria-invalid:ring-destructive/20 dark:aria-invalid:outline-destructive dark:aria-invalid:ring-destructive/50 ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 aria-invalid:border-destructive/60 dark:aria-invalid:border-destructive h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] focus-within:ring-4 focus-within:outline-1 aria-invalid:focus-within:ring-[3px] aria-invalid:focus-within:outline-none md:text-sm dark:aria-invalid:focus-within:ring-4">
+                <div className="border-input aria-invalid:outline-destructive/60 aria-invalid:ring-destructive/20 dark:aria-invalid:outline-destructive dark:aria-invalid:ring-destructive/50 ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 aria-invalid:border-destructive/60 dark:aria-invalid:border-destructive flex h-9 w-full min-w-0 items-center justify-center rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] focus-within:ring-4 focus-within:outline-1 aria-invalid:focus-within:ring-[3px] aria-invalid:focus-within:outline-none md:text-sm dark:aria-invalid:focus-within:ring-4">
                   <Input
                     placeholder="******"
                     type={showPassword ? "text" : "password"}
-                    className="border-none h-6 px-0 py-0 focus:ring-0 outline-none shadow-transparent focus-visible:ring-0 m-0"
+                    className="m-0 h-6 border-none px-0 py-0 shadow-transparent outline-none focus:ring-0 focus-visible:ring-0"
                     {...field}
                   />
                   <Button
-                    className="cursor-pointer h-6 w-6"
+                    className="h-6 w-6 cursor-pointer"
                     variant="transparent"
                     size="icon"
                     onClick={(event) => {
@@ -154,4 +148,3 @@ export function SignupForm() {
     </Form>
   );
 }
-
