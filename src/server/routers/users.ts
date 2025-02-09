@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { hashSync } from "bcryptjs";
 
 import {
   createTRPCRouter,
@@ -12,15 +13,17 @@ export const usersRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        email: z.string().email("Please provide a valid Email"),
+        email: z.string().email(),
         password: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const hashed = hashSync(input.password, 10);
+
       await ctx.db.insert(users).values({
         name: input.name,
         email: input.email,
-        password: input.password,
+        password: hashed,
         emailVerified: new Date(),
       });
     }),
