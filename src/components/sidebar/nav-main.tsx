@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 
-import { LayoutDashboardIcon, Settings2Icon } from "lucide-react";
+import {
+  BadgePlusIcon,
+  BoxesIcon,
+  LayoutDashboardIcon,
+  Settings2Icon,
+} from "lucide-react";
 
 import {
   SidebarGroup,
@@ -20,6 +25,18 @@ export function NavMain() {
           <SidebarMenuButton tooltip="Dashboard">
             <LayoutDashboardIcon />
             <span>Dashboard</span>
+          </SidebarMenuButton>
+        </Link>
+        <Link href="/projects">
+          <SidebarMenuButton tooltip="Projects">
+            <BoxesIcon />
+            <span>Projects</span>
+          </SidebarMenuButton>
+        </Link>
+        <Link href="/invitations">
+          <SidebarMenuButton tooltip="Invitations">
+            <BadgePlusIcon />
+            <span>Invitations</span>
           </SidebarMenuButton>
         </Link>
         <Link href="/settings">

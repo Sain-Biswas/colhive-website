@@ -22,6 +22,7 @@ export default async function ProtectedLayout({
   void api.organizations.getOrganizationList.prefetch({
     userId: session.user.id,
   });
+  void api.organizations.getMemberStatus.prefetch();
 
   return (
     <HydrateClient>

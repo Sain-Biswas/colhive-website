@@ -14,7 +14,7 @@ export const members = sqliteTable("members", {
   organizationId: text("organizationId")
     .notNull()
     .references(() => organizations.id),
-  role: text("role", { enum: ["owner", "admin", "manager", "member"] }),
+  role: text("role", { enum: ["owner", "admin", "member"] }),
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),
