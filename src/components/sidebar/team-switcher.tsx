@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { ChevronsUpDown, CommandIcon, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   DropdownMenu,
@@ -31,6 +32,16 @@ export function TeamSwitcher({ userId }: { userId: string }) {
   });
 
   const { activeOrganization, listOrganization } = data;
+
+  const utility = api.useUtils();
+
+  const changeActiveOrganization =
+    api.organizations.changeActiveOrganizations.useMutation({
+      onSuccess: async () => {
+        toast.success("Active Organization changed.");
+        await utility.organizations.invalidate();
+      },
+    });
 
   return (
     <SidebarMenu>
@@ -76,7 +87,14 @@ export function TeamSwitcher({ userId }: { userId: string }) {
               <DropdownMenuItem>No other organization</DropdownMenuItem>
             )}
             {listOrganization.map((team, index) => (
-              <DropdownMenuItem key={team.id} className="gap-2 p-2">
+              <DropdownMenuItem
+                key={team.id}
+                className="gap-2 p-2"
+                onClick={(event) => {
+                  event.preventDefault();
+                  changeActiveOrganization.mutate({ organizationId: team.id });
+                }}
+              >
                 <div className="flex size-6 items-center justify-center rounded-xs border">
                   <Avatar className="size-4 rounded-lg">
                     <AvatarImage
