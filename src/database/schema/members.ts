@@ -23,4 +23,13 @@ export const members = sqliteTable("members", {
     .$onUpdateFn(() => new Date()),
 });
 
-export const membersRelations = relations(members, ({ one }) => ({}));
+export const membersRelations = relations(members, ({ one }) => ({
+  user: one(users, {
+    fields: [members.userId],
+    references: [users.id],
+  }),
+  organization: one(organizations, {
+    fields: [members.organizationId],
+    references: [organizations.id],
+  }),
+}));
