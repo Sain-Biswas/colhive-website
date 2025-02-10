@@ -26,6 +26,8 @@ import { NavProjects } from "@/components/sidebar/nav-projects";
 import { NavUser } from "@/components/sidebar/nav-user";
 import { TeamSwitcher } from "@/components/sidebar/team-switcher";
 
+import { api } from "@/trpc/trpc-react-provider";
+
 // This is sample data.
 const data = {
   user: {
@@ -156,26 +158,13 @@ const data = {
   ],
 };
 
-interface AppSidebarProps {
-  user: {
-    image: string | null;
-    name: string;
-    id: string;
-    email: string | null;
-    emailVerified: Date | null;
-    createdAt: Date | null;
-    updatedAt: Date | null;
-    activeOrganization: string | null;
-  };
-}
+export function AppSidebar() {
+  const [user] = api.users.currentUser.useSuspenseQuery();
 
-export function AppSidebar({ user }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <TeamSwitcher
-          activeOrganizationId={user.activeOrganization as string}
-        />
+        <TeamSwitcher userId={user?.id || ""} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
