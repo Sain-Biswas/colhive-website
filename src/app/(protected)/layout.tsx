@@ -18,20 +18,15 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  const user = await api.users.currentUser();
-
-  if (!user?.activeOrganization) {
-    redirect("/no-organizations");
-  }
-
+  void api.users.currentUser.prefetch();
   void api.organizations.getOrganizationList.prefetch({
-    activeOrganizationId: user.activeOrganization,
+    userId: session.user.id,
   });
 
   return (
     <HydrateClient>
       <SidebarProvider>
-        <AppSidebar user={user} />
+        <AppSidebar />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
     </HydrateClient>

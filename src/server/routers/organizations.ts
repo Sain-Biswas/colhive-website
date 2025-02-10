@@ -29,18 +29,55 @@ export const organizationsRouter = createTRPCRouter({
       });
     }),
 
+  addOrganization: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        category: z.enum(["Enterprise", "Startup", "Free"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const org = await ctx.db
+        .insert(organizations)
+        .values({
+          name: input.name,
+          category: input.category,
+        })
+        .returning({ id: organizations.id });
+
+      await Promise.all([
+        ctx.db.insert(members).values({
+          userId,
+          organizationId: org[0].id,
+        }),
+        ctx.db
+          .update(users)
+          .set({ activeOrganization: org[0].id })
+          .where(eq(users.id, userId)),
+      ]);
+    }),
+
   getOrganizationList: protectedProcedure
     .input(
       z.object({
-        activeOrganizationId: z.string(),
+        userId: z.string(),
       })
     )
     .query(async ({ ctx, input }) => {
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.id, input.userId),
+        columns: {
+          activeOrganization: true,
+        },
+      });
+
       const [activeOrganization, listOrganization] = await Promise.all([
         ctx.db.query.members.findFirst({
           where: and(
             eq(members.userId, ctx.session.user.id),
-            eq(members.organizationId, input.activeOrganizationId)
+            eq(members.organizationId, user?.activeOrganization as string)
           ),
           with: {
             organization: true,
@@ -49,7 +86,7 @@ export const organizationsRouter = createTRPCRouter({
         ctx.db.query.members.findMany({
           where: and(
             eq(members.userId, ctx.session.user.id),
-            ne(members.organizationId, input.activeOrganizationId)
+            ne(members.organizationId, user?.activeOrganization as string)
           ),
           with: {
             organization: true,

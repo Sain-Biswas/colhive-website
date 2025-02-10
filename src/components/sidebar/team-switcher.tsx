@@ -24,14 +24,10 @@ import { api } from "@/trpc/trpc-react-provider";
 
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-export function TeamSwitcher({
-  activeOrganizationId,
-}: {
-  activeOrganizationId: string;
-}) {
+export function TeamSwitcher({ userId }: { userId: string }) {
   const { isMobile } = useSidebar();
   const [data] = api.organizations.getOrganizationList.useSuspenseQuery({
-    activeOrganizationId,
+    userId,
   });
 
   const { activeOrganization, listOrganization } = data;
