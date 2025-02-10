@@ -157,24 +157,25 @@ const data = {
 };
 
 interface AppSidebarProps {
-  user:
-    | {
-        image: string | null;
-        name: string;
-        id: string;
-        email: string | null;
-        emailVerified: Date | null;
-        createdAt: Date | null;
-        updatedAt: Date | null;
-      }
-    | undefined;
+  user: {
+    image: string | null;
+    name: string;
+    id: string;
+    email: string | null;
+    emailVerified: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    activeOrganization: string | null;
+  };
 }
 
 export function AppSidebar({ user }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher
+          activeOrganizationId={user.activeOrganization as string}
+        />
       </SidebarHeader>
       <SidebarContent>
         <NavMain />

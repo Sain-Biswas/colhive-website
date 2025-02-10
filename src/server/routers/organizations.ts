@@ -1,3 +1,4 @@
+import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 
 import { members, organizations, users } from "@/database/schema";
@@ -35,6 +36,30 @@ export const organizationsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      const [] = await Promise.all([]);
+      const [activeOrganization, listOrganization] = await Promise.all([
+        ctx.db.query.members.findFirst({
+          where: and(
+            eq(members.userId, ctx.session.user.id),
+            eq(members.organizationId, input.activeOrganizationId)
+          ),
+          with: {
+            organization: true,
+          },
+        }),
+        ctx.db.query.members.findMany({
+          where: and(
+            eq(members.userId, ctx.session.user.id),
+            ne(members.organizationId, input.activeOrganizationId)
+          ),
+          with: {
+            organization: true,
+          },
+        }),
+      ]);
+
+      return {
+        activeOrganization: activeOrganization?.organization,
+        listOrganization: listOrganization.map((item) => item.organization),
+      };
     }),
 });

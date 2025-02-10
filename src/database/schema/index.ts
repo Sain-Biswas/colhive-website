@@ -1,8 +1,18 @@
 import { accounts } from "./accounts";
 import { invitations } from "./invitations";
-import { members } from "./members";
-import { organizations } from "./organizations";
+import { members, membersRelations } from "./members";
+import { organizations, organizationsRelation } from "./organizations";
 import { sessions } from "./sessions";
-import { users } from "./user";
+import { users, usersRelation } from "./user";
 
-export { accounts, invitations, members, organizations, sessions, users };
+export {
+  accounts,
+  invitations,
+  members,
+  membersRelations,
+  organizations,
+  organizationsRelation,
+  sessions,
+  users,
+  usersRelation,
+};

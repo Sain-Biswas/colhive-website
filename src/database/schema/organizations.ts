@@ -1,4 +1,7 @@
+import { relations } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+import { members } from "./members";
 
 export const organizations = sqliteTable("organizations", {
   id: text("id")
@@ -14,3 +17,7 @@ export const organizations = sqliteTable("organizations", {
     .$defaultFn(() => new Date())
     .$onUpdateFn(() => new Date()),
 });
+
+export const organizationsRelation = relations(organizations, ({ many }) => ({
+  user: many(members),
+}));

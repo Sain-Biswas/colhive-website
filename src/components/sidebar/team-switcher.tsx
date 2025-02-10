@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
+import Link from "next/link";
 
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { ChevronsUpDown, CommandIcon, Plus } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -20,17 +20,21 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+import { api } from "@/trpc/trpc-react-provider";
+
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+
 export function TeamSwitcher({
-  teams,
+  activeOrganizationId,
 }: {
-  teams: {
-    name: string;
-    logo: React.ElementType;
-    plan: string;
-  }[];
+  activeOrganizationId: string;
 }) {
   const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+  const [data] = api.organizations.getOrganizationList.useSuspenseQuery({
+    activeOrganizationId,
+  });
+
+  const { activeOrganization, listOrganization } = data;
 
   return (
     <SidebarMenu>
@@ -42,13 +46,23 @@ export function TeamSwitcher({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
+                <Avatar className="size-8 rounded-lg">
+                  <AvatarImage
+                    src={activeOrganization?.logo || undefined}
+                    alt={activeOrganization?.name as string}
+                  />
+                  <AvatarFallback className="rounded-lg bg-transparent p-2">
+                    <CommandIcon />
+                  </AvatarFallback>
+                </Avatar>
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeTeam.name}
+                  {activeOrganization?.name}
                 </span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate text-xs">
+                  {activeOrganization?.category}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -62,26 +76,37 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Teams
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
-              >
+            {listOrganization.length == 0 && (
+              <DropdownMenuItem>No other organization</DropdownMenuItem>
+            )}
+            {listOrganization.map((team, index) => (
+              <DropdownMenuItem key={team.id} className="gap-2 p-2">
                 <div className="flex size-6 items-center justify-center rounded-xs border">
-                  <team.logo className="size-4 shrink-0" />
+                  <Avatar className="size-4 rounded-lg">
+                    <AvatarImage
+                      src={team?.logo || undefined}
+                      alt={team?.name as string}
+                    />
+                    <AvatarFallback className="rounded-lg">
+                      <CommandIcon />
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 {team.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="bg-background flex size-6 items-center justify-center rounded-md border">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
+            <Link href="/new-organization">
+              <DropdownMenuItem className="gap-2 p-2">
+                <div className="bg-background flex size-6 items-center justify-center rounded-md border">
+                  <Plus className="size-4" />
+                </div>
+                <div className="text-muted-foreground font-medium">
+                  Add team
+                </div>
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

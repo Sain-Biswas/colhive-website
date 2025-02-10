@@ -29,7 +29,7 @@ import {
 import { api } from "@/trpc/trpc-react-provider";
 
 const formSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, "Organization name is required"),
   category: z.enum(["Enterprise", "Startup", "Free"]),
 });
 

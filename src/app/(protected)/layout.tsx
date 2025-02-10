@@ -24,6 +24,10 @@ export default async function ProtectedLayout({
     redirect("/no-organizations");
   }
 
+  void api.organizations.getOrganizationList.prefetch({
+    activeOrganizationId: user.activeOrganization,
+  });
+
   return (
     <HydrateClient>
       <SidebarProvider>
