@@ -99,4 +99,17 @@ export const organizationsRouter = createTRPCRouter({
         listOrganization: listOrganization.map((item) => item.organization),
       };
     }),
+
+  changeActiveOrganizations: protectedProcedure
+    .input(
+      z.object({
+        organizationId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .update(users)
+        .set({ activeOrganization: input.organizationId })
+        .where(eq(users.id, ctx.session.user.id));
+    }),
 });
