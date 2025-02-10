@@ -51,6 +51,7 @@ export const organizationsRouter = createTRPCRouter({
         ctx.db.insert(members).values({
           userId,
           organizationId: org[0].id,
+          role: "owner",
         }),
         ctx.db
           .update(users)
@@ -94,6 +95,8 @@ export const organizationsRouter = createTRPCRouter({
         }),
       ]);
 
+      console.log(activeOrganization, listOrganization);
+
       return {
         activeOrganization: activeOrganization?.organization,
         listOrganization: listOrganization.map((item) => item.organization),
@@ -112,4 +115,26 @@ export const organizationsRouter = createTRPCRouter({
         .set({ activeOrganization: input.organizationId })
         .where(eq(users.id, ctx.session.user.id));
     }),
+
+  getMemberStatus: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = await ctx.db.query.users.findFirst({
+      where: eq(users.id, ctx.session.user.id),
+      columns: {
+        activeOrganization: true,
+        id: true,
+      },
+    });
+
+    const data = await ctx.db
+      .select()
+      .from(members)
+      .where(
+        and(
+          eq(members.userId, user?.id as string),
+          eq(members.organizationId, user?.activeOrganization as string)
+        )
+      );
+
+    return data[0] || null;
+  }),
 });

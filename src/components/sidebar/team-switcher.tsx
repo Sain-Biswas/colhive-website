@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 import { ChevronsUpDown, CommandIcon, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -11,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -31,7 +31,8 @@ export function TeamSwitcher({ userId }: { userId: string }) {
     userId,
   });
 
-  const { activeOrganization, listOrganization } = data;
+  const router = useRouter();
+  const path = usePathname();
 
   const utility = api.useUtils();
 
@@ -42,6 +43,18 @@ export function TeamSwitcher({ userId }: { userId: string }) {
         await utility.organizations.invalidate();
       },
     });
+
+  const { activeOrganization, listOrganization } = data;
+  if (!path.includes("/new-organization") && !path.includes("/invitations")) {
+    if (!!!activeOrganization) {
+      if (listOrganization.length === 0) {
+        router.replace("/new-organization");
+      }
+      changeActiveOrganization.mutate({
+        organizationId: listOrganization[0].id,
+      });
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -81,12 +94,12 @@ export function TeamSwitcher({ userId }: { userId: string }) {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
+              Other Organizations
             </DropdownMenuLabel>
             {listOrganization.length == 0 && (
               <DropdownMenuItem>No other organization</DropdownMenuItem>
             )}
-            {listOrganization.map((team, index) => (
+            {listOrganization.map((team) => (
               <DropdownMenuItem
                 key={team.id}
                 className="gap-2 p-2"
@@ -107,7 +120,6 @@ export function TeamSwitcher({ userId }: { userId: string }) {
                   </Avatar>
                 </div>
                 {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -117,7 +129,7 @@ export function TeamSwitcher({ userId }: { userId: string }) {
                   <Plus className="size-4" />
                 </div>
                 <div className="text-muted-foreground font-medium">
-                  Add team
+                  Add Organization
                 </div>
               </DropdownMenuItem>
             </Link>
