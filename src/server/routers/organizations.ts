@@ -1,7 +1,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 
-import { members, organizations, users } from "@/database/schema";
+import { invitations, members, organizations, users } from "@/database/schema";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
 export const organizationsRouter = createTRPCRouter({
@@ -116,7 +116,7 @@ export const organizationsRouter = createTRPCRouter({
         .where(eq(users.id, ctx.session.user.id));
     }),
 
-  getMemberStatus: protectedProcedure.mutation(async ({ ctx }) => {
+  getMemberStatus: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.query.users.findFirst({
       where: eq(users.id, ctx.session.user.id),
       columns: {
@@ -186,5 +186,23 @@ export const organizationsRouter = createTRPCRouter({
         image: member.user.image,
         email: member.user.email,
       }));
+    }),
+
+  sendInvitation: protectedProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        organizationId: z.string(),
+        role: z.enum(["owner", "admin", "member"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.insert(invitations).values({
+        email: input.email,
+        inviterId: ctx.session.user.id,
+        organizationId: input.organizationId,
+        role: input.role,
+        status: "pending",
+      });
     }),
 });
