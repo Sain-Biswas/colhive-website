@@ -7,6 +7,7 @@ import {
   BoxesIcon,
   LayoutDashboardIcon,
   Settings2Icon,
+  Users2Icon,
 } from "lucide-react";
 
 import {
@@ -37,6 +38,12 @@ export function NavMain() {
           <SidebarMenuButton tooltip="Invitations">
             <BadgePlusIcon />
             <span>Invitations</span>
+          </SidebarMenuButton>
+        </Link>
+        <Link href="/members">
+          <SidebarMenuButton tooltip="Members">
+            <Users2Icon />
+            <span>Members</span>
           </SidebarMenuButton>
         </Link>
         <Link href="/settings">
