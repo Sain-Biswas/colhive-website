@@ -1,12 +1,16 @@
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-red-500 underline">
-        Hello world!
-      </h1>
-      <Button>Hello</Button>
+    <div className="flex gap-8">
+      <Button variant="link">
+        <Link href="/login">Login</Link>
+      </Button>
+      <Button variant="link">
+        <Link href="/dashboard">Dashboard</Link>
+      </Button>
     </div>
   );
 }
