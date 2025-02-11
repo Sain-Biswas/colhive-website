@@ -11,6 +11,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 import { api } from "@/trpc/trpc-react-provider";
 
+import NewMemberDialog from "./new-member-dialog";
+
 export default function MembersPage() {
   const [user] = api.users.currentUser.useSuspenseQuery();
   const [organization] =
@@ -72,7 +74,9 @@ export default function MembersPage() {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <div></div>
+        <div>
+          <NewMemberDialog />
+        </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
