@@ -53,7 +53,7 @@ export default function NewMemberDialog() {
   const [organization] =
     api.organizations.getActiveOrganization.useSuspenseQuery();
 
-  const sendInvitation = api.organizations.sendInvitation.useMutation({
+  const sendInvitation = api.members.sendInvitation.useMutation({
     onSuccess: async (_data, variables) => {
       toast.success(`Invitation has been sent to ${variables.email}`, {
         description:

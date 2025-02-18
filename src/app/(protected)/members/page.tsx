@@ -22,7 +22,7 @@ export default function MembersPage() {
     data: members,
     isLoading,
     isError,
-  } = api.organizations.getAllMembers.useQuery({
+  } = api.members.getAllMembers.useQuery({
     organizationId: organization?.id as string,
   });
 
