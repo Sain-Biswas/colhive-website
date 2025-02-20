@@ -94,7 +94,7 @@ export function LoginForm() {
                   />
                   <Button
                     className="h-6 w-6 cursor-pointer"
-                    variant="transparent"
+                    variant="default"
                     size="icon"
                     onClick={(event) => {
                       event.preventDefault();

@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,6 +8,12 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+
+export const metadata: Metadata = {
+  title: "Projects | Colhive - Project Management Solution",
+  description:
+    "A Modern easy to use web service to help organize and streamline industrial workflow in new generation organiza",
+};
 
 export default function ProjectsPage() {
   return (
