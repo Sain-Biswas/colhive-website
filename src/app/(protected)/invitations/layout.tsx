@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { ReactNode } from "react";
 
 import {
@@ -12,6 +13,12 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { api } from "@/trpc/server";
 
 import PathSwitcherInvitation from "./path-switcher";
+
+export const metadata: Metadata = {
+  title: "Invitations | Colhive - Project Management Solution",
+  description:
+    "A Modern easy to use web service to help organize and streamline industrial workflow in new generation organiza",
+};
 
 export default async function InvitationsLayout({
   children,
