@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { organizations } from "./organizations";
@@ -20,3 +21,18 @@ export const invitations = sqliteTable("invitations", {
     () => new Date()
   ),
 });
+
+export const invitationRelations = relations(invitations, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [invitations.organizationId],
+    references: [organizations.id],
+  }),
+  sentTo: one(users, {
+    fields: [invitations.email],
+    references: [users.email],
+  }),
+  sentFrom: one(users, {
+    fields: [invitations.inviterId],
+    references: [users.id],
+  }),
+}));
