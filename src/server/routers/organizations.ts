@@ -126,6 +126,6 @@ export const organizationsRouter = createTRPCRouter({
       where: eq(organizations.id, user?.activeOrganization as string),
     });
 
-    return organization;
+    return organization || null;
   }),
 });

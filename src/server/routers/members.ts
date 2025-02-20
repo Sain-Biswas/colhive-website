@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { invitations, members } from "@/database/schema";
+import { invitations, members, users } from "@/database/schema";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
 export const membersRouter = createTRPCRouter({
@@ -57,4 +57,59 @@ export const membersRouter = createTRPCRouter({
         status: "pending",
       });
     }),
+
+  getPendingInvitations: protectedProcedure.query(async ({ ctx }) => {
+    const list = await ctx.db.query.invitations.findMany({
+      where: and(
+        eq(invitations.email, ctx.session.user.email as string),
+        eq(invitations.status, "pending")
+      ),
+      with: {
+        sentFrom: true,
+        organization: true,
+      },
+    });
+
+    return list.map((item) => ({
+      id: item.id,
+      role: item.role,
+      organizationName: item.organization?.name,
+      organizationLogo: item.organization?.logo,
+      organizationStatus: item.organization?.category,
+      senderName: item.sentFrom?.name,
+      senderLogo: item.sentFrom?.image,
+      senderEmail: item.sentFrom?.email,
+      sentOn: item.createdAt,
+    }));
+  }),
+
+  getSentInvitations: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.query.users.findFirst({
+      where: eq(users.id, ctx.session.user.id),
+      columns: {
+        activeOrganization: true,
+        id: true,
+      },
+    });
+
+    const list = await ctx.db.query.invitations.findMany({
+      where: and(
+        eq(invitations.inviterId, user?.id as string),
+        eq(invitations.organizationId, user?.activeOrganization as string)
+      ),
+      with: {
+        sentTo: true,
+      },
+    });
+
+    return list.map((item) => ({
+      id: item.id,
+      role: item.role,
+      status: item.status,
+      sentName: item.sentTo.image,
+      sentImage: item.sentTo.image,
+      sentEmail: item.sentTo.email,
+      sentOn: item.createdAt,
+    }));
+  }),
 });
