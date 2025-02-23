@@ -20,7 +20,7 @@ export default async function credentialsLogin(
       message: "User login successful",
       description: "Sending you to dashboard",
     };
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     if (error instanceof AuthError) {
       if (error.type === "CredentialsSignin") {
