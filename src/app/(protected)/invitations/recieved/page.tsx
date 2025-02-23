@@ -1,3 +1,9 @@
+import { RecievedInvitationsTable } from "./table";
+
 export default function RecievedInvitationPage() {
-  return <div>Recieved Invitations</div>;
+  return (
+    <>
+      <RecievedInvitationsTable />
+    </>
+  );
 }

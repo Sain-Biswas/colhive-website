@@ -112,4 +112,41 @@ export const membersRouter = createTRPCRouter({
       sentOn: item.createdAt,
     }));
   }),
+
+  acceptInvitation: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const invitation = await ctx.db
+        .update(invitations)
+        .set({
+          status: "accepted",
+        })
+        .where(eq(invitations.id, input.id))
+        .returning();
+
+      await ctx.db.insert(members).values({
+        organizationId: invitation[0].organizationId as string,
+        userId: ctx.session.user.id,
+        role: invitation[0].role,
+      });
+    }),
+
+  rejectInvitation: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .update(invitations)
+        .set({
+          status: "rejected",
+        })
+        .where(eq(invitations.id, input.id));
+    }),
 });
