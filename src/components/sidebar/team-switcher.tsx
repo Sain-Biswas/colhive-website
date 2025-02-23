@@ -118,13 +118,13 @@ export function TeamSwitcher({ userId }: { userId: string }) {
                   changeActiveOrganization.mutate({ organizationId: team.id });
                 }}
               >
-                <div className="flex size-6 items-center justify-center rounded-xs border">
-                  <Avatar className="size-4 rounded-lg">
+                <div className="flex size-6 items-center justify-center rounded-md border">
+                  <Avatar className="size-6 rounded-md">
                     <AvatarImage
                       src={team?.logo || undefined}
                       alt={team?.name as string}
                     />
-                    <AvatarFallback className="rounded-lg">
+                    <AvatarFallback className="rounded-md">
                       <CommandIcon />
                     </AvatarFallback>
                   </Avatar>
