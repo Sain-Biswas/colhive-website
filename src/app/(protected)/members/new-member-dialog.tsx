@@ -88,6 +88,10 @@ export default function NewMemberDialog() {
     console.log(values);
   }
 
+  if (memberStatus.role === "member") {
+    return <></>;
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
