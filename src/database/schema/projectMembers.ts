@@ -1,20 +1,22 @@
 import { relations } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-import { organizations } from "./organizations";
+import { projects } from "./projects";
 import { users } from "./user";
 
-export const members = sqliteTable("members", {
+export const projectMembers = sqliteTable("projectMembers", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  organizationId: text("organizationId")
+  projectId: text("projectId")
     .notNull()
-    .references(() => organizations.id, { onDelete: "cascade" }),
-  role: text("role", { enum: ["owner", "admin", "member"] }),
+    .references(() => projects.id, { onDelete: "cascade" }),
+  role: text("role", {
+    enum: ["manager", "team-lead", "designer", "developer", "tester"],
+  }),
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),
@@ -23,13 +25,13 @@ export const members = sqliteTable("members", {
     .$onUpdateFn(() => new Date()),
 });
 
-export const membersRelations = relations(members, ({ one }) => ({
+export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
   user: one(users, {
-    fields: [members.userId],
+    fields: [projectMembers.userId],
     references: [users.id],
   }),
-  organization: one(organizations, {
-    fields: [members.organizationId],
-    references: [organizations.id],
+  project: one(projects, {
+    fields: [projectMembers.projectId],
+    references: [projects.id],
   }),
 }));

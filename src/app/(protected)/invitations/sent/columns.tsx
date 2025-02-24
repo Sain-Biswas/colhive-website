@@ -8,6 +8,10 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+
+import { invitationStatuses } from "@/constants/mappings/invitationStatuses";
+import { roles } from "@/constants/mappings/roles";
 import { RouterOutputs, api } from "@/trpc/trpc-react-provider";
 
 export type TSentInvitations =
@@ -17,13 +21,7 @@ export const columns: ColumnDef<TSentInvitations>[] = [
   {
     accessorKey: "sentName",
     header: ({ column }) => (
-      <Button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="flex items-center gap-2"
-        variant="ghost"
-      >
-        Sender
-      </Button>
+      <DataTableColumnHeader column={column} title="Sender" />
     ),
     cell: ({ row }) => {
       const logo = row.original.sentImage || undefined;
@@ -52,28 +50,54 @@ export const columns: ColumnDef<TSentInvitations>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <Button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="flex items-center gap-2"
-        variant="ghost"
-      >
-        Status
-      </Button>
+      <DataTableColumnHeader column={column} title="Status" />
     ),
-    cell: ({ row }) => <p className="capitalize">{row.getValue("status")}</p>,
+    cell: ({ row }) => {
+      const invitation = invitationStatuses.find(
+        (invitation) => invitation.value === row.getValue("status")
+      );
+
+      if (!invitation) {
+        return null;
+      }
+
+      return (
+        <div className="flex w-[100px] items-center">
+          {invitation.icon && (
+            <invitation.icon className="text-muted-foreground mr-2 h-4 w-4" />
+          )}
+          <span>{invitation.label}</span>
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "role",
     header: ({ column }) => (
-      <Button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="flex items-center gap-2"
-        variant="ghost"
-      >
-        Role
-      </Button>
+      <DataTableColumnHeader column={column} title="Roles" />
     ),
-    cell: ({ row }) => <p className="capitalize">{row.getValue("role")}</p>,
+    cell: ({ row }) => {
+      const role = roles.find((role) => role.value === row.getValue("role"));
+
+      if (!role) {
+        return null;
+      }
+
+      return (
+        <div className="flex w-[100px] items-center">
+          {role.icon && (
+            <role.icon className="text-muted-foreground mr-2 h-4 w-4" />
+          )}
+          <span>{role.label}</span>
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "sentOn",
