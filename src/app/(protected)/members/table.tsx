@@ -3,7 +3,6 @@
 import * as React from "react";
 
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -28,16 +27,15 @@ import {
 
 import { DataTablePagination } from "@/components/table/data-table-pagination";
 
-import { api } from "@/trpc/trpc-react-provider";
-
-import { TMembers } from "./column";
+import { TMembers, columns } from "./column";
 import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps {
-  columns: ColumnDef<TMembers>[];
+  data: TMembers[];
 }
 
-export function DataTable({ columns }: DataTableProps) {
+export function MembersTable({ data }: DataTableProps) {
+  "use no memo";
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -45,12 +43,6 @@ export function DataTable({ columns }: DataTableProps) {
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
-
-  const [org] = api.organizations.getActiveOrganization.useSuspenseQuery();
-
-  const [data] = api.members.getAllMembers.useSuspenseQuery({
-    organizationId: org?.id as string,
-  });
 
   const table = useReactTable({
     data,
