@@ -1,7 +1,7 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { Building2Icon, ShieldIcon, UserRoundIcon, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,27 +9,11 @@ import { Input } from "@/components/ui/input";
 import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-filter";
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
 
+import { roles } from "@/constants/mappings/roles";
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
-
-export const roles = [
-  {
-    label: "Owner",
-    value: "owner",
-    icon: Building2Icon,
-  },
-  {
-    label: "Admin",
-    value: "admin",
-    icon: ShieldIcon,
-  },
-  {
-    label: "Member",
-    value: "member",
-    icon: UserRoundIcon,
-  },
-];
 
 export function DataTableToolbar<TData>({
   table,

@@ -6,6 +6,9 @@ import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+
+import { roles } from "@/constants/mappings/roles";
 import { RouterOutputs } from "@/trpc/trpc-react-provider";
 
 export type TMembers = RouterOutputs["members"]["getAllMembers"][0];
@@ -14,13 +17,7 @@ export const columns: ColumnDef<TMembers>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <Button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="-ml-3 flex items-center gap-2"
-        variant="ghost"
-      >
-        Name
-      </Button>
+      <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
       const logo = row.original.image || undefined;
@@ -49,15 +46,27 @@ export const columns: ColumnDef<TMembers>[] = [
   {
     accessorKey: "role",
     header: ({ column }) => (
-      <Button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="-ml-3 flex items-center gap-2"
-        variant="ghost"
-      >
-        Role
-      </Button>
+      <DataTableColumnHeader column={column} title="Roles" />
     ),
-    cell: ({ row }) => <p className="capitalize">{row.getValue("role")}</p>,
+    cell: ({ row }) => {
+      const role = roles.find((role) => role.value === row.getValue("role"));
+
+      if (!role) {
+        return null;
+      }
+
+      return (
+        <div className="flex w-[100px] items-center">
+          {role.icon && (
+            <role.icon className="text-muted-foreground mr-2 h-4 w-4" />
+          )}
+          <span>{role.label}</span>
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "joiningDate",
