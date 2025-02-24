@@ -166,12 +166,12 @@ function RecievedInvitationTableActions({
 }) {
   const utility = api.useUtils();
   const acceptInvitationMutation = api.members.acceptInvitation.useMutation({
-    onSuccess() {
+    async onSuccess() {
       toast.success(`Invitation to ${invitation.organizationName} Accepted`, {
         description: "You can switch to new organization now.",
       });
-      utility.members.getPendingInvitations.invalidate();
-      utility.organizations.invalidate();
+      await utility.members.getPendingInvitations.invalidate();
+      await utility.organizations.invalidate();
     },
     onError() {
       toast.error("Some thing went wrong!", {
@@ -185,11 +185,11 @@ function RecievedInvitationTableActions({
   }
 
   const rejectedInvitationMutation = api.members.rejectInvitation.useMutation({
-    onSuccess() {
+    async onSuccess() {
       toast.success(`Invitation to ${invitation.organizationName} Rejected`, {
         description: "Sender will be notified of the same.",
       });
-      utility.members.getPendingInvitations.invalidate();
+      await utility.members.getPendingInvitations.invalidate();
     },
     onError() {
       toast.error("Some thing went wrong!", {

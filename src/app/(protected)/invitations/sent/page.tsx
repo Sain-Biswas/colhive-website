@@ -1,3 +1,9 @@
+import { SentInvitationsTable } from "./table";
+
 export default function SentInvitationPage() {
-  return <div>Sent Invitations</div>;
+  return (
+    <>
+      <SentInvitationsTable />
+    </>
+  );
 }

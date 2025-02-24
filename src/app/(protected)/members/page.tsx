@@ -12,6 +12,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { api } from "@/trpc/trpc-react-provider";
 
 import NewMemberDialog from "./new-member-dialog";
+import { MembersTable } from "./table";
 
 export default function MembersPage() {
   // const [user] = api.users.currentUser.useSuspenseQuery();
@@ -79,7 +80,7 @@ export default function MembersPage() {
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        {JSON.stringify(members)}
+        <MembersTable data={members!} />
       </div>
     </>
   );

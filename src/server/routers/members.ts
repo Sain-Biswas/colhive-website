@@ -106,7 +106,7 @@ export const membersRouter = createTRPCRouter({
       id: item.id,
       role: item.role,
       status: item.status,
-      sentName: item.sentTo.image,
+      sentName: item.sentTo.name,
       sentImage: item.sentTo.image,
       sentEmail: item.sentTo.email,
       sentOn: item.createdAt,
@@ -144,9 +144,22 @@ export const membersRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(invitations)
-        .set({
-          status: "rejected",
-        })
+        .set({ status: "rejected" })
         .where(eq(invitations.id, input.id));
+    }),
+
+  cancelInvitation: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .update(invitations)
+        .set({ status: "canceled" })
+        .where(eq(invitations.id, input));
+    }),
+
+  deleteInvitations: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.delete(invitations).where(eq(invitations.id, input));
     }),
 });

@@ -41,6 +41,7 @@ export function TeamSwitcher({ userId }: { userId: string }) {
       onSuccess: async () => {
         toast.success("Active Organization changed.");
         await utility.organizations.invalidate();
+        await utility.members.invalidate();
       },
     });
 
