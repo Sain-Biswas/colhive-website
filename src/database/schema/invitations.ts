@@ -10,9 +10,13 @@ export const invitations = sqliteTable("invitations", {
     .$defaultFn(() => crypto.randomUUID()),
   email: text("email")
     .notNull()
-    .references(() => users.email),
-  inviterId: text("inviterId").references(() => users.id),
-  organizationId: text("organizationId").references(() => organizations.id),
+    .references(() => users.email, { onDelete: "cascade" }),
+  inviterId: text("inviterId").references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  organizationId: text("organizationId").references(() => organizations.id, {
+    onDelete: "cascade",
+  }),
   role: text("role", { enum: ["owner", "admin", "member"] }),
   status: text("status", {
     enum: ["pending", "accepted", "rejected", "canceled"],
