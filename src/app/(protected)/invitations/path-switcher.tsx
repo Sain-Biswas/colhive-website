@@ -15,17 +15,6 @@ export default function PathSwitcherInvitation() {
       <Button
         className={cn(
           "h-8 w-20 p-2",
-          path === "project" &&
-            "bg-background text-foreground hover:bg-background hover:text-foreground focus:bg-background focus:text-foreground"
-        )}
-        variant="ghost"
-        onClick={() => router.push("/invitations/project")}
-      >
-        Project
-      </Button>
-      <Button
-        className={cn(
-          "h-8 w-20 p-2",
           path === "recieved" &&
             "bg-background text-foreground hover:bg-background hover:text-foreground focus:bg-background focus:text-foreground"
         )}
