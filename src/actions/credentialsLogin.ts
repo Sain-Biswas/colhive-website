@@ -21,7 +21,6 @@ export default async function credentialsLogin(
       description: "Sending you to dashboard",
     };
   } catch (error) {
-    console.log(error);
     if (error instanceof AuthError) {
       if (error.type === "CredentialsSignin") {
         if (error.message.includes("UserNotFoundError")) {

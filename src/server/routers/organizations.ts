@@ -71,8 +71,6 @@ export const organizationsRouter = createTRPCRouter({
         }),
       ]);
 
-      console.log(activeOrganization, listOrganization);
-
       return {
         activeOrganization: activeOrganization?.organization,
         listOrganization: listOrganization.map((item) => item.organization),
