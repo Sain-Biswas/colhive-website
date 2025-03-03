@@ -22,6 +22,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+
+import { roles } from "@/constants/mappings/roles";
 import { RouterOutputs, api } from "@/trpc/trpc-react-provider";
 
 export type TRecievedInvitations =
@@ -92,14 +95,27 @@ export const columns: ColumnDef<TRecievedInvitations>[] = [
   {
     accessorKey: "role",
     header: ({ column }) => (
-      <button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="flex items-center gap-2"
-      >
-        Role
-      </button>
+      <DataTableColumnHeader column={column} title="Roles" />
     ),
-    cell: ({ row }) => <p className="capitalize">{row.getValue("role")}</p>,
+    cell: ({ row }) => {
+      const role = roles.find((role) => role.value === row.getValue("role"));
+
+      if (!role) {
+        return null;
+      }
+
+      return (
+        <div className="flex w-[100px] items-center">
+          {role.icon && (
+            <role.icon className="text-muted-foreground mr-2 h-4 w-4" />
+          )}
+          <span>{role.label}</span>
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "senderName",

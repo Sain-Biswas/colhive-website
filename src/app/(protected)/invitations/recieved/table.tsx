@@ -13,16 +13,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -43,6 +35,7 @@ import { useIsDesktop } from "@/hooks/use-desktop";
 import { api } from "@/trpc/trpc-react-provider";
 
 import { columns } from "./columns";
+import { DataTableToolbar } from "./data-table-toolbar";
 
 export function RecievedInvitationsTable() {
   "use no memo";
@@ -90,46 +83,9 @@ export function RecievedInvitationsTable() {
     },
   });
 
-  const organizationColumn = table.getColumn("organizationName");
-
   return (
-    <div>
-      <div className="flex items-center gap-4 py-4">
-        <Input
-          placeholder="Filter organizations..."
-          value={(organizationColumn?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            organizationColumn?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+    <div className="space-y-4">
+      <DataTableToolbar table={table} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
