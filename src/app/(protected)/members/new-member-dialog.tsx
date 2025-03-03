@@ -85,7 +85,6 @@ export default function NewMemberDialog() {
       role,
       organizationId: organization?.id as string,
     });
-    console.log(values);
   }
 
   if (memberStatus.role === "member") {
