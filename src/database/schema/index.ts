@@ -2,7 +2,7 @@ import { accounts } from "./accounts";
 import { invitationRelations, invitations } from "./invitations";
 import { members, membersRelations } from "./members";
 import { organizations, organizationsRelation } from "./organizations";
-import { projectMembers, projectMembersRelations } from "./projectMembers";
+import { projectMembers, projectMembersRelations } from "./project-members";
 import { projectRelations, projects } from "./projects";
 import { sessions } from "./sessions";
 import { users, usersRelation } from "./user";

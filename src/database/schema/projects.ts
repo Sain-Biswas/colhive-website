@@ -1,8 +1,10 @@
 import { relations } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { ulid } from "ulid";
 
 import { organizations } from "./organizations";
-import { projectMembers } from "./projectMembers";
+import { projectMembers } from "./project-members";
+import { teams } from "./teams";
 
 export const projects = sqliteTable("projects", {
   id: text("id")
@@ -10,6 +12,9 @@ export const projects = sqliteTable("projects", {
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name"),
   logo: text("logo"),
+  identifier: text("identifier")
+    .unique()
+    .$defaultFn(() => ulid()),
   organizationId: text("organizationId")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
@@ -27,4 +32,5 @@ export const projectRelations = relations(projects, ({ one, many }) => ({
     references: [organizations.id],
   }),
   members: many(projectMembers),
+  teams: many(teams),
 }));
