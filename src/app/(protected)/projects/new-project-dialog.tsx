@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
 
 import { api } from "@/trpc/trpc-react-provider";
 
@@ -91,6 +92,12 @@ export default function NewProjectDialog() {
             Create a new project within {organization?.name}
           </DialogTitle>
         </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
+          ></form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
