@@ -9,6 +9,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
+import NewProjectDialog from "./new-project-dialog";
+
 export const metadata: Metadata = {
   title: "Projects | Colhive - Project Management Solution",
   description:
@@ -18,8 +20,8 @@ export const metadata: Metadata = {
 export default function ProjectsPage() {
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <div className="flex items-center gap-2">
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
@@ -32,6 +34,9 @@ export default function ProjectsPage() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+        </div>
+        <div>
+          <NewProjectDialog />
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
