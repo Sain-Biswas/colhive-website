@@ -1,3 +1,5 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CirclePlusIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
