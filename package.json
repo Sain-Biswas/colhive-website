@@ -34,6 +34,7 @@
     "@trpc/client": "11.0.0-rc.747",
     "@trpc/react-query": "11.0.0-rc.747",
     "@trpc/server": "11.0.0-rc.747",
+    "@xstate/store": "^3.2.0",
     "babel-plugin-react-compiler": "19.0.0-beta-714736e-20250131",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
