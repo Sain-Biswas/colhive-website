@@ -47,6 +47,8 @@ export function TeamSwitcher({ userId }: { userId: string }) {
 
   const { activeOrganization, listOrganization } = data;
 
+  console.log(listOrganization);
+
   if (!path.includes("/new-organization") && !path.includes("/invitations")) {
     if (!!!activeOrganization) {
       if (listOrganization.length === 0) {
