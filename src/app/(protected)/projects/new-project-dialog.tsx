@@ -55,6 +55,7 @@ export type TMember = {
 
 const formSchema = z.object({
   name: z.string().min(1, "Project name is needed for creation."),
+  description: z.string(),
   members: z
     .array(
       z.object({
@@ -93,6 +94,7 @@ export default function NewProjectDialog() {
     defaultValues: {
       name: "",
       members: [],
+      description: "",
     },
   });
 
@@ -212,7 +214,23 @@ export default function NewProjectDialog() {
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Project Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      className="border-input w-full rounded-md border px-3 py-2"
+                      placeholder="About project in brief"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="members"
