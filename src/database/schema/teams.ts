@@ -9,7 +9,9 @@ export const teams = sqliteTable("teams", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  name: text("name"),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  responsibility: text("responsibility").notNull(),
   logo: text("logo"),
   identifier: text("identifier")
     .unique()

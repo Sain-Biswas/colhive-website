@@ -11,16 +11,24 @@ export const invitations = sqliteTable("invitations", {
   email: text("email")
     .notNull()
     .references(() => users.email, { onDelete: "cascade" }),
-  inviterId: text("inviterId").references(() => users.id, {
-    onDelete: "cascade",
-  }),
-  organizationId: text("organizationId").references(() => organizations.id, {
-    onDelete: "cascade",
-  }),
-  role: text("role", { enum: ["owner", "admin", "member"] }),
+  inviterId: text("inviterId")
+    .notNull()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    }),
+  organizationId: text("organizationId")
+    .notNull()
+    .references(() => organizations.id, {
+      onDelete: "cascade",
+    }),
+  role: text("role", { enum: ["owner", "admin", "member"] })
+    .notNull()
+    .$defaultFn(() => "member"),
   status: text("status", {
     enum: ["pending", "accepted", "rejected", "canceled"],
-  }),
+  })
+    .notNull()
+    .$defaultFn(() => "pending"),
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),

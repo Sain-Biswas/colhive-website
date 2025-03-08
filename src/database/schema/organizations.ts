@@ -7,9 +7,11 @@ export const organizations = sqliteTable("organizations", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  name: text("name"),
+  name: text("name").notNull(),
   logo: text("logo"),
-  category: text("category", { enum: ["Enterprise", "Startup", "Free"] }),
+  category: text("category", {
+    enum: ["Enterprise", "Startup", "Free"],
+  }).notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),

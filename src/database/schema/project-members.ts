@@ -24,7 +24,7 @@ export const projectMembers = sqliteTable("project-members", {
       "member",
       "sub-lead",
     ],
-  }),
+  }).notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),

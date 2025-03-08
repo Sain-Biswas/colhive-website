@@ -14,7 +14,9 @@ export const members = sqliteTable("members", {
   organizationId: text("organizationId")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
-  role: text("role", { enum: ["owner", "admin", "member"] }),
+  role: text("role", { enum: ["owner", "admin", "member"] })
+    .notNull()
+    .$defaultFn(() => "member"),
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),

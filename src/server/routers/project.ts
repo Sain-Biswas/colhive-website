@@ -9,6 +9,7 @@ export const projectsRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1, "Project name is needed for creation."),
         organizationId: z.string().uuid(),
+        description: z.string(),
         members: z
           .array(
             z.object({
@@ -33,6 +34,7 @@ export const projectsRouter = createTRPCRouter({
         .values({
           name: input.name,
           organizationId: input.organizationId,
+          description: input.description,
         })
         .returning({ id: projects.id });
 
