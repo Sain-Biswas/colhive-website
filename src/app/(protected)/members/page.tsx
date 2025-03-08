@@ -19,6 +19,10 @@ export default function MembersPage() {
   const [organization] =
     api.organizations.getActiveOrganization.useSuspenseQuery();
 
+  if (!organization?.id) {
+    return null;
+  }
+
   const {
     data: members,
     isLoading,

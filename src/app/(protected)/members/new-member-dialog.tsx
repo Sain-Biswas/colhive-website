@@ -87,7 +87,7 @@ export default function NewMemberDialog() {
     });
   }
 
-  if (memberStatus.role === "member") {
+  if (memberStatus && memberStatus.role === "member") {
     return <></>;
   }
 

@@ -54,7 +54,7 @@ export const organizationsRouter = createTRPCRouter({
         ctx.db.query.members.findFirst({
           where: and(
             eq(members.userId, ctx.session.user.id),
-            eq(members.organizationId, user?.activeOrganization as string)
+            eq(members.organizationId, user?.activeOrganization || "")
           ),
           with: {
             organization: true,
@@ -63,7 +63,7 @@ export const organizationsRouter = createTRPCRouter({
         ctx.db.query.members.findMany({
           where: and(
             eq(members.userId, ctx.session.user.id),
-            ne(members.organizationId, user?.activeOrganization as string)
+            ne(members.organizationId, user?.activeOrganization || "")
           ),
           with: {
             organization: true,
