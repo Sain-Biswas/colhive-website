@@ -1,3 +1,4 @@
+import { accounts } from "./accounts";
 import { invitationRelations, invitations } from "./invitations";
 import { members, membersRelations } from "./members";
 import { organizations, organizationsRelation } from "./organizations";
@@ -6,6 +7,7 @@ import { projectRelations, projects } from "./projects";
 import { users, usersRelation } from "./user";
 
 export {
+  accounts,
   invitationRelations,
   invitations,
   members,

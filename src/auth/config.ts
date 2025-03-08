@@ -9,7 +9,7 @@ import {
 import Credentials from "next-auth/providers/credentials";
 
 import { db } from "@/database";
-import { accounts, sessions, users } from "@/database/schema";
+import { accounts, users } from "@/database/schema";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -27,7 +27,6 @@ declare module "next-auth" {
 const adapter = DrizzleAdapter(db, {
   usersTable: users,
   accountsTable: accounts,
-  sessionsTable: sessions,
 });
 
 export const authConfig = {
