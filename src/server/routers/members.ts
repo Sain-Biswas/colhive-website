@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 
 import { invitations, members, users } from "@/database/schema";
@@ -49,6 +49,40 @@ export const membersRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const [allInvitations, organizationMembers] = await Promise.all([
+        ctx.db.query.invitations.findMany({
+          where: and(
+            eq(invitations.organizationId, input.organizationId),
+            ne(invitations.status, "canceled")
+          ),
+          with: {
+            sentTo: true,
+          },
+        }),
+        ctx.db.query.members.findMany({
+          where: eq(members.organizationId, input.organizationId),
+          with: {
+            user: true,
+          },
+        }),
+      ]);
+
+      const existingMember = organizationMembers.filter(
+        (member) => member.user.email === input.email
+      );
+
+      const sentInvitation = allInvitations.filter(
+        (m) => m.sentTo.email === input.email
+      );
+
+      if (existingMember.length > 0) {
+        throw new Error("MEMBER_ALREADY_PRESENT");
+      }
+
+      if (sentInvitation.length > 0) {
+        throw new Error("INVITATION_ALREADY_SENT");
+      }
+
       await ctx.db.insert(invitations).values({
         email: input.email,
         inviterId: ctx.session.user.id,

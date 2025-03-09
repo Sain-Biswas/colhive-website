@@ -70,6 +70,17 @@ export default function NewMemberDialog() {
         toast.error(`No user with email ${variables.email}`, {
           description: "Please check the data and try again.",
         });
+      } else if (error.shape?.message === "MEMBER_ALREADY_PRESENT") {
+        toast.error(`Member with email ${variables.email} already present`, {
+          description: "Try searching memvers list or verify the email.",
+        });
+      } else if (error.shape?.message === "INVITATION_ALREADY_SENT") {
+        toast.error(
+          `Invitation to  ${variables.email} already sent from your organization`,
+          {
+            description: "Try verifing the email or check with other admins",
+          }
+        );
       } else {
         toast.error("Something went wrong.", {
           description: "Please try again.",
@@ -148,7 +159,11 @@ export default function NewMemberDialog() {
               )}
             />
             <DialogFooter>
-              <Button type="submit" className="">
+              <Button
+                type="submit"
+                className=""
+                disabled={sendInvitation.isPending}
+              >
                 Send Invitation
               </Button>
             </DialogFooter>
