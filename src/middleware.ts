@@ -3,6 +3,14 @@ import { type NextRequest, NextResponse } from "next/server";
 import getOrganizationListInMiddleware from "./actions/getOrganizationListInMiddleware";
 import { auth } from "./auth";
 
+// Define protected routes in a Set for O(1) lookups
+const PROTECTED_ROUTES = new Set([
+  "/dashboard",
+  "/members",
+  "/projects",
+  "/settings",
+]);
+
 export async function middleware(request: NextRequest) {
   const session = await auth();
   const isAuthenticated = !!session?.user;
@@ -11,12 +19,12 @@ export async function middleware(request: NextRequest) {
     console.log("Middleware Executed");
   }
 
-  if (
-    request.nextUrl.pathname.includes("/dashboard") ||
-    request.nextUrl.pathname.includes("/members") ||
-    request.nextUrl.pathname.includes("/projects") ||
-    request.nextUrl.pathname.includes("/settings")
-  ) {
+  // Check if the current path is a protected route
+  const isProtectedRoute = Array.from(PROTECTED_ROUTES).some((route) =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isProtectedRoute) {
     if (!isAuthenticated) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
