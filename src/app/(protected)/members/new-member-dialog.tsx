@@ -50,6 +50,7 @@ export default function NewMemberDialog() {
   });
 
   const [memberStatus] = api.organizations.getMemberStatus.useSuspenseQuery();
+
   const [organization] =
     api.organizations.getActiveOrganization.useSuspenseQuery();
 
@@ -72,7 +73,7 @@ export default function NewMemberDialog() {
         });
       } else if (error.shape?.message === "MEMBER_ALREADY_PRESENT") {
         toast.error(`Member with email ${variables.email} already present`, {
-          description: "Try searching memvers list or verify the email.",
+          description: "Try searching members list or verify the email.",
         });
       } else if (error.shape?.message === "INVITATION_ALREADY_SENT") {
         toast.error(
@@ -98,7 +99,7 @@ export default function NewMemberDialog() {
     });
   }
 
-  if (memberStatus && memberStatus.role === "member") {
+  if (memberStatus.role === "member") {
     return <></>;
   }
 

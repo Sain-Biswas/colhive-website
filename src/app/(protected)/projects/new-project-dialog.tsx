@@ -88,6 +88,11 @@ export default function NewProjectDialog() {
   "use no memo";
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [memberStatus] = api.organizations.getMemberStatus.useSuspenseQuery();
+
+  if (memberStatus.role === "member") {
+    return <></>;
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -238,7 +243,7 @@ export default function NewProjectDialog() {
                 <FormItem>
                   <FormLabel>Select Project Members</FormLabel>
 
-                  <div className="flex flex-col space-y-4">
+                  <div className="flex w-full flex-col space-y-4">
                     <Popover open={open} onOpenChange={setOpen}>
                       <PopoverTrigger asChild>
                         <Button
@@ -255,7 +260,7 @@ export default function NewProjectDialog() {
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-full p-0" align="start">
+                      <PopoverContent className="w-full p-0" align="center">
                         <div className="border-border flex items-center border-b p-2">
                           <Search className="text-muted-foreground mr-2 h-4 w-4" />
                           <input
@@ -383,6 +388,7 @@ export default function NewProjectDialog() {
 
                               <button
                                 type="button"
+                                disabled={createProjectMutation.isPending}
                                 onClick={() =>
                                   handleToggleMember(memberDetails)
                                 }
