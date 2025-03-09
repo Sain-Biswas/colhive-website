@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 import { ChevronsUpDown, CommandIcon, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -31,7 +32,6 @@ export function TeamSwitcher({ userId }: { userId: string }) {
     userId,
   });
 
-  const router = useRouter();
   const path = usePathname();
 
   const utility = api.useUtils();
@@ -49,16 +49,15 @@ export function TeamSwitcher({ userId }: { userId: string }) {
 
   console.log(listOrganization);
 
-  if (!path.includes("/new-organization") && !path.includes("/invitations")) {
-    if (!!!activeOrganization) {
-      if (listOrganization.length === 0) {
-        router.replace("/new-organization");
+  useEffect(() => {
+    if (!path.includes("/new-organization") && !path.includes("/invitations")) {
+      if (!!!activeOrganization) {
+        changeActiveOrganization.mutate({
+          organizationId: listOrganization[0].id,
+        });
       }
-      changeActiveOrganization.mutate({
-        organizationId: listOrganization[0].id,
-      });
     }
-  }
+  }, []);
 
   return (
     <SidebarMenu>
