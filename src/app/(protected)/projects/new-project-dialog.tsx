@@ -90,10 +90,6 @@ export default function NewProjectDialog() {
   const [searchQuery, setSearchQuery] = useState("");
   const [memberStatus] = api.organizations.getMemberStatus.useSuspenseQuery();
 
-  if (memberStatus.role === "member") {
-    return <></>;
-  }
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -173,6 +169,10 @@ export default function NewProjectDialog() {
       ...values,
       organizationId: organization?.id || "",
     });
+  }
+
+  if (memberStatus.role === "member") {
+    return <></>;
   }
 
   if (isFetching) {
