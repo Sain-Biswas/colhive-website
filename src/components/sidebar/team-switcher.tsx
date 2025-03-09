@@ -28,6 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function TeamSwitcher({ userId }: { userId: string }) {
   const { isMobile } = useSidebar();
+
   const [data] = api.organizations.getOrganizationList.useSuspenseQuery({
     userId,
   });
@@ -57,7 +58,7 @@ export function TeamSwitcher({ userId }: { userId: string }) {
         });
       }
     }
-  }, []);
+  }, [path, activeOrganization, listOrganization, changeActiveOrganization]);
 
   return (
     <SidebarMenu>
