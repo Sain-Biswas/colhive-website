@@ -34,7 +34,7 @@ export function NavMain() {
             <span>Projects</span>
           </SidebarMenuButton>
         </Link>
-        <Link href="/invitations">
+        <Link href="/invitations/recieved">
           <SidebarMenuButton tooltip="Invitations">
             <BadgePlusIcon />
             <span>Invitations</span>

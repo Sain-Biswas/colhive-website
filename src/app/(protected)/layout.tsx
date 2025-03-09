@@ -20,7 +20,7 @@ export default async function ProtectedLayout({
 
   void api.users.currentUser.prefetch();
   void api.organizations.getOrganizationList.prefetch({
-    userId: session.user.id,
+    userId: session?.user.id,
   });
   void api.organizations.getMemberStatus.prefetch();
   void api.organizations.getActiveOrganization.prefetch();
