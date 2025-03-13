@@ -33,10 +33,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import LoadingSpinner from "@/components/general/loading-spinner";
+
 import { api } from "@/trpc/trpc-react-provider";
 
 const formSchema = z.object({
-  email: z.string().email("Please enter an valid email address."),
+  email: z.string().email("Please enter a valid email address."),
   role: z.enum(["owner", "admin", "member"]),
 });
 
@@ -58,30 +60,29 @@ export default function NewMemberDialog() {
     onSuccess: async (_data, variables) => {
       toast.success(`Invitation has been sent to ${variables.email}`, {
         description:
-          "They will be available in your Organizations member list once they accept it.",
+          "They will be available in your organization's member list once they accept it.",
       });
 
       form.reset();
     },
-    onError: async (error, variables) => {
-      if (
-        error.shape?.message ===
-        "SQLITE_CONSTRAINT_FOREIGNKEY: FOREIGN KEY constraint failed"
-      ) {
-        toast.error(`No user with email ${variables.email}`, {
-          description: "Please check the data and try again.",
+    onError: async (error) => {
+      if (error.data?.code === "NOT_FOUND") {
+        toast.error(error.message, {
+          description: "Please check the email and try again.",
         });
-      } else if (error.shape?.message === "MEMBER_ALREADY_PRESENT") {
-        toast.error(`Member with email ${variables.email} already present`, {
-          description: "Try searching members list or verify the email.",
+      } else if (error.data?.code === "BAD_REQUEST") {
+        toast.error("User does not have an active organization.", {
+          description:
+            "You must be a part of an organization to sent invitations",
         });
-      } else if (error.shape?.message === "INVITATION_ALREADY_SENT") {
-        toast.error(
-          `Invitation to  ${variables.email} already sent from your organization`,
-          {
-            description: "Try verifing the email or check with other admins",
-          }
-        );
+      } else if (error.data?.code === "CONFLICT") {
+        toast.error(error.message, {
+          description: "Try searching the members list or verify the email.",
+        });
+      } else if (error.data?.code === "PRECONDITION_FAILED") {
+        toast.error(error.message, {
+          description: "Verify the email or check with other admins.",
+        });
       } else {
         toast.error("Something went wrong.", {
           description: "Please try again.",
@@ -90,32 +91,39 @@ export default function NewMemberDialog() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { email, role } = values;
+  // Form submission handler
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (!organization?.id) {
+      toast.error("No active organization found.", {
+        description: "Please select an active organization.",
+      });
+      return;
+    }
+
     sendInvitation.mutate({
-      email,
-      role,
-      organizationId: organization?.id as string,
+      email: values.email,
+      role: values.role,
+      organizationId: organization.id,
     });
-  }
+  };
 
   if (memberStatus?.role === "member") {
-    return <></>;
+    return null;
   }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button>
-          <CirclePlusIcon />
-          <p>Add Member</p>
+          <CirclePlusIcon className="mr-2 h-4 w-4" />
+          Add Member
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Send Invitation to Other Users</DialogTitle>
           <DialogDescription>
-            Enter details below of the new member
+            Enter details below to invite a new member to your organization.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -125,7 +133,7 @@ export default function NewMemberDialog() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Members Email</FormLabel>
+                  <FormLabel>Member&apos;s Email</FormLabel>
                   <FormControl>
                     <Input placeholder="something@example.com" {...field} />
                   </FormControl>
@@ -133,22 +141,24 @@ export default function NewMemberDialog() {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Member&apos;s role on joining</FormLabel>
+                  <FormLabel>Member&apos;s Role</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a relevant type" />
+                        <SelectValue placeholder="Select a role" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      {/* Only show "Admin" option if the current user is an owner */}
                       {memberStatus?.role === "owner" && (
                         <SelectItem value="admin">Admin</SelectItem>
                       )}
@@ -159,12 +169,10 @@ export default function NewMemberDialog() {
                 </FormItem>
               )}
             />
+
             <DialogFooter>
-              <Button
-                type="submit"
-                className=""
-                disabled={sendInvitation.isPending}
-              >
+              <Button type="submit" disabled={sendInvitation.isPending}>
+                <LoadingSpinner isVisible={sendInvitation.isPending} />
                 Send Invitation
               </Button>
             </DialogFooter>

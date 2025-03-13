@@ -52,12 +52,31 @@ export const membersRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { email, organizationId, role } = input;
 
-      const user = await ctx.db.query.users.findFirst({
-        where: eq(users.id, ctx.session.user.id),
-        columns: {
-          activeOrganization: true,
-        },
-      });
+      const [user, existingInvitation, target] = await Promise.all([
+        ctx.db.query.users.findFirst({
+          where: eq(users.id, ctx.session.user.id),
+          columns: {
+            activeOrganization: true,
+          },
+        }),
+
+        ctx.db.query.invitations.findFirst({
+          where: and(
+            eq(invitations.organizationId, organizationId),
+            eq(invitations.email, email),
+            ne(invitations.status, "canceled"),
+            ne(invitations.status, "rejected")
+          ),
+        }),
+        ctx.db.query.users.findFirst({
+          where: eq(users.email, email),
+          columns: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        }),
+      ]);
 
       if (!user?.activeOrganization) {
         throw new TRPCError({
@@ -66,32 +85,31 @@ export const membersRouter = createTRPCRouter({
         });
       }
 
-      const existingMember = await ctx.db.query.members.findFirst({
-        where: and(
-          eq(members.organizationId, organizationId),
-          eq(users.email, email)
-        ),
-      });
-
-      if (existingMember) {
+      if (!target?.id) {
         throw new TRPCError({
-          code: "CONFLICT",
-          message: "User is already a member of this organization.",
+          code: "NOT_FOUND",
+          message: `No user with email ${input.email}.`,
         });
       }
 
-      const existingInvitation = await ctx.db.query.invitations.findFirst({
+      const existingMember = await ctx.db.query.members.findFirst({
         where: and(
-          eq(invitations.organizationId, organizationId),
-          eq(invitations.email, email),
-          ne(invitations.status, "canceled")
+          eq(members.organizationId, organizationId),
+          eq(members.userId, target.id)
         ),
       });
 
-      if (existingInvitation) {
+      if (!!existingMember) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "An invitation has already been sent to this email.",
+          message: `${target.name} is already a member of this organization.`,
+        });
+      }
+
+      if (!!existingInvitation) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: `An invitation has already been sent to ${target.name}.`,
         });
       }
 
