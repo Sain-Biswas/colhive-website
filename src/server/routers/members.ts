@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 
@@ -49,53 +50,66 @@ export const membersRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const [allInvitations, organizationMembers] = await Promise.all([
-        ctx.db.query.invitations.findMany({
-          where: and(
-            eq(invitations.organizationId, input.organizationId),
-            ne(invitations.status, "canceled")
-          ),
-          with: {
-            sentTo: true,
-          },
-        }),
-        ctx.db.query.members.findMany({
-          where: eq(members.organizationId, input.organizationId),
-          with: {
-            user: true,
-          },
-        }),
-      ]);
+      const { email, organizationId, role } = input;
 
-      const existingMember = organizationMembers.filter(
-        (member) => member.user.email === input.email
-      );
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+        columns: {
+          activeOrganization: true,
+        },
+      });
 
-      const sentInvitation = allInvitations.filter(
-        (m) => m.sentTo.email === input.email
-      );
-
-      if (existingMember.length > 0) {
-        throw new Error("MEMBER_ALREADY_PRESENT");
+      if (!user?.activeOrganization) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User does not have an active organization.",
+        });
       }
 
-      if (sentInvitation.length > 0) {
-        throw new Error("INVITATION_ALREADY_SENT");
+      const existingMember = await ctx.db.query.members.findFirst({
+        where: and(
+          eq(members.organizationId, organizationId),
+          eq(users.email, email)
+        ),
+      });
+
+      if (existingMember) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "User is already a member of this organization.",
+        });
+      }
+
+      const existingInvitation = await ctx.db.query.invitations.findFirst({
+        where: and(
+          eq(invitations.organizationId, organizationId),
+          eq(invitations.email, email),
+          ne(invitations.status, "canceled")
+        ),
+      });
+
+      if (existingInvitation) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "An invitation has already been sent to this email.",
+        });
       }
 
       await ctx.db.insert(invitations).values({
-        email: input.email,
+        email,
         inviterId: ctx.session.user.id,
-        organizationId: input.organizationId,
-        role: input.role,
+        organizationId,
+        role,
         status: "pending",
       });
+
+      return { success: true, message: "Invitation sent successfully." };
     }),
 
   getPendingInvitations: protectedProcedure.query(async ({ ctx }) => {
-    const list = await ctx.db.query.invitations.findMany({
+    const pendingInvitations = await ctx.db.query.invitations.findMany({
       where: and(
-        eq(invitations.email, ctx.session.user.email as string),
+        eq(invitations.email, ctx.session.user.email || ""),
         eq(invitations.status, "pending")
       ),
       with: {
@@ -104,16 +118,16 @@ export const membersRouter = createTRPCRouter({
       },
     });
 
-    return list.map((item) => ({
-      id: item.id,
-      role: item.role,
-      organizationName: item.organization?.name,
-      organizationLogo: item.organization?.logo,
-      organizationStatus: item.organization?.category,
-      senderName: item.sentFrom?.name,
-      senderLogo: item.sentFrom?.image,
-      senderEmail: item.sentFrom?.email,
-      sentOn: item.createdAt,
+    return pendingInvitations.map((invitation) => ({
+      id: invitation.id,
+      role: invitation.role,
+      organizationName: invitation.organization?.name,
+      organizationLogo: invitation.organization?.logo,
+      organizationStatus: invitation.organization?.category,
+      senderName: invitation.sentFrom?.name,
+      senderLogo: invitation.sentFrom?.image,
+      senderEmail: invitation.sentFrom?.email,
+      sentOn: invitation.createdAt,
     }));
   }),
 
@@ -122,64 +136,68 @@ export const membersRouter = createTRPCRouter({
       where: eq(users.id, ctx.session.user.id),
       columns: {
         activeOrganization: true,
-        id: true,
       },
     });
 
-    const list = await ctx.db.query.invitations.findMany({
+    if (!user?.activeOrganization) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User does not have an active organization.",
+      });
+    }
+
+    const sentInvitations = await ctx.db.query.invitations.findMany({
       where: and(
-        eq(invitations.inviterId, user?.id as string),
-        eq(invitations.organizationId, user?.activeOrganization as string)
+        eq(invitations.inviterId, ctx.session.user.id),
+        eq(invitations.organizationId, user.activeOrganization)
       ),
       with: {
         sentTo: true,
       },
     });
 
-    return list.map((item) => ({
-      id: item.id,
-      role: item.role,
-      status: item.status,
-      sentName: item.sentTo.name,
-      sentImage: item.sentTo.image,
-      sentEmail: item.sentTo.email,
-      sentOn: item.createdAt,
+    return sentInvitations.map((invitation) => ({
+      id: invitation.id,
+      role: invitation.role,
+      status: invitation.status,
+      sentName: invitation.sentTo.name,
+      sentImage: invitation.sentTo.image,
+      sentEmail: invitation.sentTo.email,
+      sentOn: invitation.createdAt,
     }));
   }),
 
   acceptInvitation: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      })
-    )
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const invitation = await ctx.db
-        .update(invitations)
-        .set({
-          status: "accepted",
-        })
-        .where(eq(invitations.id, input.id))
-        .returning();
+      const { id } = input;
 
-      await ctx.db.insert(members).values({
-        organizationId: invitation[0].organizationId as string,
-        userId: ctx.session.user.id,
-        role: invitation[0].role,
+      await ctx.db.transaction(async (tx) => {
+        const [invitation] = await tx
+          .update(invitations)
+          .set({ status: "accepted" })
+          .where(eq(invitations.id, id))
+          .returning();
+
+        await tx.insert(members).values({
+          organizationId: invitation.organizationId,
+          userId: ctx.session.user.id,
+          role: invitation.role,
+        });
       });
+
+      return { success: true, message: "Invitation accepted successfully." };
     }),
 
   rejectInvitation: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      })
-    )
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(invitations)
         .set({ status: "rejected" })
         .where(eq(invitations.id, input.id));
+
+      return { success: true, message: "Invitation rejected successfully." };
     }),
 
   cancelInvitation: protectedProcedure
@@ -189,11 +207,15 @@ export const membersRouter = createTRPCRouter({
         .update(invitations)
         .set({ status: "canceled" })
         .where(eq(invitations.id, input));
+
+      return { success: true, message: "Invitation canceled successfully." };
     }),
 
   deleteInvitations: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       await ctx.db.delete(invitations).where(eq(invitations.id, input));
+
+      return { success: true, message: "Invitation deleted successfully." };
     }),
 });
