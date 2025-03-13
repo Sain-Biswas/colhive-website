@@ -55,15 +55,12 @@ export function SignupForm() {
       router.push("/login");
     },
     onError(error) {
-      if (
-        error.shape?.message ===
-        "SQLITE_CONSTRAINT_UNIQUE: UNIQUE constraint failed: user.email"
-      ) {
+      if (error.data?.code === "CONFLICT") {
         toast.error("User already registered.", {
           description: "Please Login using your credentials.",
         });
       } else {
-        toast.error("User registration Error.", {
+        toast.error("User registration Failed.", {
           description: "Please try again.",
         });
       }

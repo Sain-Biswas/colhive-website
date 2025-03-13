@@ -409,7 +409,16 @@ export default function NewProjectDialog() {
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={createProjectMutation.isPending}
+            >
+              {createProjectMutation.isPending && (
+                <div className="size-3 animate-spin rounded-full border-t-2 text-transparent">
+                  .
+                </div>
+              )}
               Create Project
             </Button>
           </form>
