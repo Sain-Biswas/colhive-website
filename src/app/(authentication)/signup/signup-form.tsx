@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+import LoadingSpinner from "@/components/general/loading-spinner";
+
 import { api } from "@/trpc/trpc-react-provider";
 
 const formSchema = z.object({
@@ -141,11 +143,7 @@ export function SignupForm() {
           className="w-full"
           disabled={registerUser.isPending}
         >
-          {registerUser.isPending && (
-            <div className="size-3 animate-spin rounded-full border-t-2 text-transparent">
-              .
-            </div>
-          )}
+          <LoadingSpinner isVisible={registerUser.isPending} />
           Sign Up
         </Button>
       </form>

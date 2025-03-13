@@ -24,6 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import LoadingSpinner from "@/components/general/loading-spinner";
+
 import { api } from "@/trpc/trpc-react-provider";
 
 const formSchema = z.object({
@@ -64,7 +66,6 @@ export default function NewOrganizationForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Organization Name Field */}
         <FormField
           control={form.control}
           name="name"
@@ -79,7 +80,6 @@ export default function NewOrganizationForm() {
           )}
         />
 
-        {/* Organization Type Field */}
         <FormField
           control={form.control}
           name="category"
@@ -106,15 +106,13 @@ export default function NewOrganizationForm() {
           )}
         />
 
-        {/* Submit Button */}
         <Button
           type="submit"
           className="w-full"
           disabled={addOrganization.isPending}
         >
-          {addOrganization.isPending
-            ? "Creating Organization..."
-            : "Create New Organization"}
+          <LoadingSpinner isVisible={addOrganization.isPending} />
+          Create New Organization
         </Button>
       </form>
     </Form>
