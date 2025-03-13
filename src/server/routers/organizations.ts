@@ -1,4 +1,5 @@
-import { and, eq, ne } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { members, organizations, users } from "@/database/schema";
@@ -8,120 +9,142 @@ export const organizationsRouter = createTRPCRouter({
   addOrganization: protectedProcedure
     .input(
       z.object({
-        name: z.string().min(1),
+        name: z.string().min(1, "Organization name is required."),
         category: z.enum(["Enterprise", "Startup", "Free"]),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      const org = await ctx.db
-        .insert(organizations)
-        .values({
-          name: input.name,
-          category: input.category,
-        })
-        .returning({ id: organizations.id });
+      const org = await ctx.db.transaction(async (tx) => {
+        const [org] = await tx
+          .insert(organizations)
+          .values({
+            name: input.name,
+            category: input.category,
+          })
+          .returning({ id: organizations.id });
 
-      await Promise.all([
-        ctx.db.insert(members).values({
+        await tx.insert(members).values({
           userId,
-          organizationId: org[0].id,
+          organizationId: org.id,
           role: "owner",
-        }),
-        ctx.db
+        });
+
+        await tx
           .update(users)
-          .set({ activeOrganization: org[0].id })
-          .where(eq(users.id, userId)),
-      ]);
+          .set({ activeOrganization: org.id })
+          .where(eq(users.id, userId));
+
+        return org;
+      });
+
+      return { success: true, organizationId: org.id };
     }),
 
-  getOrganizationList: protectedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const user = await ctx.db.query.users.findFirst({
-        where: eq(users.id, input.userId),
+  getOrganizationList: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    const [user, organizationsList] = await Promise.all([
+      ctx.db.query.users.findFirst({
+        where: eq(users.id, userId),
         columns: {
           activeOrganization: true,
         },
-      });
+      }),
+      ctx.db.query.members.findMany({
+        where: eq(members.userId, userId),
+        with: {
+          organization: true,
+        },
+      }),
+    ]);
 
-      const [activeOrganization, listOrganization] = await Promise.all([
-        ctx.db.query.members.findFirst({
-          where: and(
-            eq(members.userId, ctx.session.user.id),
-            eq(members.organizationId, user?.activeOrganization || "")
-          ),
-          with: {
-            organization: true,
-          },
-        }),
-        ctx.db.query.members.findMany({
-          where: and(
-            eq(members.userId, ctx.session.user.id),
-            ne(members.organizationId, user?.activeOrganization || "")
-          ),
-          with: {
-            organization: true,
-          },
-        }),
-      ]);
+    const activeOrganization = organizationsList.find(
+      (item) => item.organizationId === user?.activeOrganization
+    )?.organization;
 
-      return {
-        activeOrganization: activeOrganization?.organization,
-        listOrganization: listOrganization.map((item) => item.organization),
-      };
-    }),
+    const listOrganization = organizationsList
+      .filter((item) => item.organizationId !== user?.activeOrganization)
+      .map((item) => item.organization);
 
-  changeActiveOrganizations: protectedProcedure
+    return {
+      activeOrganization,
+      listOrganization,
+    };
+  }),
+
+  changeActiveOrganization: protectedProcedure
     .input(
       z.object({
-        organizationId: z.string(),
+        organizationId: z.string().min(1, "Organization ID is required."),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const isMember = await ctx.db.query.members.findFirst({
+        where: and(
+          eq(members.userId, userId),
+          eq(members.organizationId, input.organizationId)
+        ),
+      });
+
+      if (!isMember) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not a member of this organization.",
+        });
+      }
+
       await ctx.db
         .update(users)
         .set({ activeOrganization: input.organizationId })
-        .where(eq(users.id, ctx.session.user.id));
+        .where(eq(users.id, userId));
+
+      return { success: true };
     }),
 
   getMemberStatus: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
     const user = await ctx.db.query.users.findFirst({
-      where: eq(users.id, ctx.session.user.id),
+      where: eq(users.id, userId),
       columns: {
         activeOrganization: true,
-        id: true,
       },
     });
 
-    const data = await ctx.db
-      .select()
-      .from(members)
-      .where(
-        and(
-          eq(members.userId, user?.id as string),
-          eq(members.organizationId, user?.activeOrganization as string)
-        )
-      );
+    if (!user?.activeOrganization) {
+      return null;
+    }
 
-    return data[0] || null;
+    const memberStatus = await ctx.db.query.members.findFirst({
+      where: and(
+        eq(members.userId, userId),
+        eq(members.organizationId, user.activeOrganization)
+      ),
+    });
+
+    return memberStatus || null;
   }),
 
   getActiveOrganization: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
     const user = await ctx.db.query.users.findFirst({
-      where: eq(users.id, ctx.session.user.id),
+      where: eq(users.id, userId),
       columns: {
         activeOrganization: true,
       },
     });
 
+    if (!user?.activeOrganization) {
+      return null;
+    }
+
     const organization = await ctx.db.query.organizations.findFirst({
-      where: eq(organizations.id, user?.activeOrganization as string),
+      where: eq(organizations.id, user.activeOrganization),
     });
 
     return organization || null;

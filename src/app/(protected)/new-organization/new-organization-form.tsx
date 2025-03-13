@@ -27,7 +27,7 @@ import {
 import { api } from "@/trpc/trpc-react-provider";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Organization name must be provided."),
+  name: z.string().min(1, "Organization name is required."),
   category: z.enum(["Enterprise", "Startup", "Free"]),
 });
 
@@ -44,7 +44,7 @@ export default function NewOrganizationForm() {
   const addOrganization = api.organizations.addOrganization.useMutation({
     onSuccess: async () => {
       toast.success("New organization created successfully.", {
-        description: "Changing active organization to new one.",
+        description: "Changing active organization to the new one.",
       });
 
       await utility.organizations.invalidate();
@@ -52,21 +52,19 @@ export default function NewOrganizationForm() {
     onError: () => {
       toast.error("Something went wrong.", {
         description:
-          "Organization can't be created. Try again after some time.",
+          "Organization could not be created. Please try again later.",
       });
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    addOrganization.mutate({
-      name: values.name,
-      category: values.category,
-    });
-  }
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    addOrganization.mutate(values);
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Organization Name Field */}
         <FormField
           control={form.control}
           name="name"
@@ -74,12 +72,14 @@ export default function NewOrganizationForm() {
             <FormItem>
               <FormLabel>Organization Name</FormLabel>
               <FormControl>
-                <Input placeholder="First Middle Last" {...field} />
+                <Input placeholder="Enter organization name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Organization Type Field */}
         <FormField
           control={form.control}
           name="category"
@@ -99,14 +99,22 @@ export default function NewOrganizationForm() {
                 </SelectContent>
               </Select>
               <FormDescription>
-                Your payment depends on which organization type you choose.
+                Your payment depends on the organization type you choose.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Create new Organization
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={addOrganization.isPending}
+        >
+          {addOrganization.isPending
+            ? "Creating Organization..."
+            : "Create New Organization"}
         </Button>
       </form>
     </Form>
