@@ -28,7 +28,6 @@ export const usersRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
 
-      // Check if the email is already registered
       const existingUser = await db.query.users.findFirst({
         where: eq(users.email, input.email),
       });
@@ -40,10 +39,8 @@ export const usersRouter = createTRPCRouter({
         });
       }
 
-      // Hash the password
       const hashedPassword = await hash(input.password, 10);
 
-      // Insert the new user
       await db.insert(users).values({
         name: input.name,
         email: input.email,
@@ -95,7 +92,6 @@ export const usersRouter = createTRPCRouter({
       const { db, session } = ctx;
       const userId = session.user.id;
 
-      // Fetch the user to verify the password
       const user = await db.query.users.findFirst({
         where: eq(users.id, userId),
         columns: {
@@ -110,7 +106,6 @@ export const usersRouter = createTRPCRouter({
         });
       }
 
-      // Verify the password
       const isPasswordValid = await compare(input.password, user.password);
 
       if (!isPasswordValid) {
@@ -120,7 +115,6 @@ export const usersRouter = createTRPCRouter({
         });
       }
 
-      // Delete the user
       await db.delete(users).where(eq(users.id, userId));
 
       return { success: true, message: "User deleted successfully" };

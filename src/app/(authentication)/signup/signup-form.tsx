@@ -27,7 +27,7 @@ const formSchema = z.object({
   email: z
     .string()
     .min(1, "Email is required.")
-    .email("Please provide a valid Email"),
+    .email("Please provide a valid email."),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters long.")
@@ -35,7 +35,7 @@ const formSchema = z.object({
 });
 
 export function SignupForm() {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -48,38 +48,32 @@ export function SignupForm() {
   });
 
   const registerUser = api.users.register.useMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       toast.success("User created successfully.", {
         description: "Please check your inbox to verify your email.",
       });
       router.push("/login");
     },
-    onError(error) {
+    onError: (error) => {
       if (error.data?.code === "CONFLICT") {
         toast.error("User already registered.", {
-          description: "Please Login using your credentials.",
+          description: "Please log in using your credentials.",
         });
       } else {
-        toast.error("User registration Failed.", {
+        toast.error("User registration failed.", {
           description: "Please try again.",
         });
       }
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { email, name, password } = values;
-
-    registerUser.mutate({
-      email,
-      name,
-      password,
-    });
-  }
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    registerUser.mutate(values);
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -93,6 +87,7 @@ export function SignupForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="email"
@@ -106,6 +101,7 @@ export function SignupForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="password"
@@ -113,23 +109,25 @@ export function SignupForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <div className="border-input aria-invalid:outline-destructive/60 aria-invalid:ring-destructive/20 dark:aria-invalid:outline-destructive dark:aria-invalid:ring-destructive/50 ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 aria-invalid:border-destructive/60 dark:aria-invalid:border-destructive flex h-9 w-full min-w-0 items-center justify-center rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] focus-within:ring-4 focus-within:outline-1 aria-invalid:focus-within:ring-[3px] aria-invalid:focus-within:outline-none md:text-sm dark:aria-invalid:focus-within:ring-4">
+                <div className="relative">
                   <Input
                     placeholder="******"
                     type={showPassword ? "text" : "password"}
-                    className="m-0 h-6 border-none px-0 py-0 shadow-transparent outline-none focus:ring-0 focus-visible:ring-0"
+                    className="pr-10"
                     {...field}
                   />
                   <Button
-                    className="h-6 w-6 cursor-pointer"
-                    variant="default"
+                    type="button"
+                    variant="ghost"
                     size="icon"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      setShowPassword((curr) => !curr);
-                    }}
+                    className="absolute top-1/2 right-2 -translate-y-1/2 transform"
+                    onClick={() => setShowPassword((curr) => !curr)}
                   >
-                    {showPassword ? <EyeIcon /> : <EyeOffIcon />}
+                    {showPassword ? (
+                      <EyeOffIcon className="h-4 w-4" />
+                    ) : (
+                      <EyeIcon className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </FormControl>
@@ -137,11 +135,17 @@ export function SignupForm() {
             </FormItem>
           )}
         />
+
         <Button
           type="submit"
           className="w-full"
           disabled={registerUser.isPending}
         >
+          {registerUser.isPending && (
+            <div className="size-3 animate-spin rounded-full border-t-2 text-transparent">
+              .
+            </div>
+          )}
           Sign Up
         </Button>
       </form>
