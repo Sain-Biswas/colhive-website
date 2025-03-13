@@ -99,7 +99,7 @@ export default function NewMemberDialog() {
     });
   }
 
-  if (memberStatus.role === "member") {
+  if (memberStatus?.role === "member") {
     return <></>;
   }
 
@@ -149,7 +149,7 @@ export default function NewMemberDialog() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {memberStatus.role === "owner" && (
+                      {memberStatus?.role === "owner" && (
                         <SelectItem value="admin">Admin</SelectItem>
                       )}
                       <SelectItem value="member">Member</SelectItem>

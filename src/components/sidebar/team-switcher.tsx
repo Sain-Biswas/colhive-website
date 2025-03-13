@@ -26,19 +26,17 @@ import { api } from "@/trpc/trpc-react-provider";
 
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-export function TeamSwitcher({ userId }: { userId: string }) {
+export function TeamSwitcher() {
   const { isMobile } = useSidebar();
 
-  const [data] = api.organizations.getOrganizationList.useSuspenseQuery({
-    userId,
-  });
+  const [data] = api.organizations.getOrganizationList.useSuspenseQuery();
 
   const path = usePathname();
 
   const utility = api.useUtils();
 
   const changeActiveOrganization =
-    api.organizations.changeActiveOrganizations.useMutation({
+    api.organizations.changeActiveOrganization.useMutation({
       onSuccess: async () => {
         toast.success("Active Organization changed.");
         await utility.organizations.invalidate();

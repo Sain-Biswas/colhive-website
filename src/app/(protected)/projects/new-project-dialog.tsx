@@ -171,7 +171,7 @@ export default function NewProjectDialog() {
     });
   }
 
-  if (memberStatus.role === "member") {
+  if (memberStatus?.role === "member") {
     return <></>;
   }
 

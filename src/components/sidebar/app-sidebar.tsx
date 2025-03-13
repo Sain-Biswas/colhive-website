@@ -164,7 +164,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <TeamSwitcher userId={user?.id || ""} />
+        <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain />

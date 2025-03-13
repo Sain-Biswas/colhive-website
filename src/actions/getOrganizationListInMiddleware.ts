@@ -1,37 +1,32 @@
-import { and, eq, ne } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import "server-only";
 
 import { db } from "@/database";
 import { members, users } from "@/database/schema";
 
 export default async function getOrganizationListInMiddleware(userId: string) {
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, userId),
-    columns: {
-      activeOrganization: true,
-    },
-  });
-
-  const [activeOrganization, listOrganization] = await Promise.all([
-    db.query.members.findFirst({
-      where: and(
-        eq(members.userId, userId),
-        eq(members.organizationId, user?.activeOrganization || "")
-      ),
-      with: {
-        organization: true,
+  const [user, organizationsList] = await Promise.all([
+    db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: {
+        activeOrganization: true,
       },
     }),
     db.query.members.findMany({
-      where: and(
-        eq(members.userId, userId),
-        ne(members.organizationId, user?.activeOrganization || "")
-      ),
+      where: eq(members.userId, userId),
       with: {
         organization: true,
       },
     }),
   ]);
+
+  const activeOrganization = organizationsList.find(
+    (item) => item.organizationId === user?.activeOrganization
+  )?.organization;
+
+  const listOrganization = organizationsList
+    .filter((item) => item.organizationId !== user?.activeOrganization)
+    .map((item) => item.organization);
 
   return !!activeOrganization || listOrganization.length > 0;
 }
