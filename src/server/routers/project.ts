@@ -1,6 +1,7 @@
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
-import { projectMembers, projects } from "@/database/schema";
+import { projectMembers, projects, users } from "@/database/schema";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
 export const projectsRouter = createTRPCRouter({
@@ -45,4 +46,79 @@ export const projectsRouter = createTRPCRouter({
         }))
       );
     }),
+
+  getProjectList: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.query.users.findFirst({
+      where: eq(users.id, ctx.session.user.id),
+      columns: {
+        activeOrganization: true,
+      },
+    });
+
+    const projectsList = await ctx.db.query.projects.findMany({
+      where: eq(projects.organizationId, user?.activeOrganization || ""),
+      columns: {
+        id: true,
+        name: true,
+        description: true,
+        logo: true,
+        identifier: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      with: {
+        members: {
+          where: eq(projectMembers.role, "manager"),
+          columns: {
+            role: true,
+          },
+          with: {
+            user: {
+              columns: {
+                id: true,
+                email: true,
+                image: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const projectIdList = projectsList.map((project) => project.id);
+
+    const memberOfProjects = await ctx.db
+      .select()
+      .from(projectMembers)
+      .where(
+        and(
+          inArray(projectMembers.projectId, projectIdList),
+          eq(projectMembers.userId, ctx.session.user.id)
+        )
+      );
+
+    const memberOfProjectsList = memberOfProjects.map(
+      (project) => project.projectId
+    );
+
+    return projectsList
+      .filter((item) => memberOfProjectsList.includes(item.id))
+      .map((project) => ({
+        id: project.id,
+        identifier: project.identifier,
+        logo: project.logo,
+        name: project.name,
+        description: project.description,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+        managers: project.members.map((manager) => ({
+          role: manager.role,
+          id: manager.user.id,
+          email: manager.user.email,
+          name: manager.user.name,
+          image: manager.user.image,
+        })),
+      }));
+  }),
 });
