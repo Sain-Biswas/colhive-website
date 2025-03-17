@@ -12,8 +12,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 import { api } from "@/trpc/server";
 
-import NewProjectDialog from "./new-project-dialog";
-
 export const metadata: Metadata = {
   title: "Projects | Colhive - Project Management Solution",
   description:
@@ -26,6 +24,7 @@ export default async function ProjectsLayout({
   children: ReactNode;
 }>) {
   void api.projects.getProjectList.prefetch();
+  void api.members.getAllMembers();
 
   return (
     <>
@@ -44,11 +43,8 @@ export default async function ProjectsLayout({
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <div>
-          <NewProjectDialog />
-        </div>
       </header>
-      <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+      <main className="min-h-[calc(100vh-4rem)] p-4 pt-0">{children}</main>
     </>
   );
 }

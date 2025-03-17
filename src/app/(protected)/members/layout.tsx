@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { ReactNode } from "react";
 
+import { api } from "@/trpc/server";
+
 export const metadata: Metadata = {
   title: "Members | Colhive - Project Management Solution",
   description:
@@ -12,5 +14,7 @@ export default function MembersLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  void api.members.getAllMembers.prefetch();
+
   return children;
 }

@@ -102,9 +102,7 @@ export default function NewProjectDialog() {
   const [organization] =
     api.organizations.getActiveOrganization.useSuspenseQuery();
 
-  const { data: members, isFetching } = api.members.getAllMembers.useQuery({
-    organizationId: organization?.id || "",
-  });
+  const [members] = api.members.getAllMembers.useSuspenseQuery();
 
   const selectedMembers = form.watch("members");
 
@@ -173,17 +171,6 @@ export default function NewProjectDialog() {
 
   if (memberStatus?.role === "member") {
     return <></>;
-  }
-
-  if (isFetching) {
-    return (
-      <Button>
-        <div className="size-4 animate-spin rounded-full border-t-2 text-transparent">
-          .
-        </div>
-        <p>Loading</p>
-      </Button>
-    );
   }
 
   return (
