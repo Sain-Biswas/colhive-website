@@ -1,14 +1,27 @@
-import { PageProps } from "../../../../../.next/types/app/page";
+import { api } from "@/trpc/server";
 
-interface SingleProjectPageProps extends PageProps {
-  params: Promise<{
-    projectId: string;
-  }>;
-}
+import ProjectDetails from "./components/project-details";
 
-export default async function SingleProjectPage({
+export default async function Page({
   params,
-}: SingleProjectPageProps) {
+}: {
+  params: Promise<{ projectId: string }>;
+}) {
   const { projectId } = await params;
-  return <div>Hello, {projectId}</div>;
+
+  const organization = await api.organizations.getActiveOrganization.call({});
+
+  void api.projects.getProject.prefetch({
+    projectId,
+    organizationId: organization?.id || "",
+  });
+
+  return (
+    <main>
+      <ProjectDetails
+        organizationId={organization?.id || ""}
+        projectId={projectId}
+      />
+    </main>
+  );
 }

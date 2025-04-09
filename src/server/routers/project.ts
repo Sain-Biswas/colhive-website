@@ -121,4 +121,47 @@ export const projectsRouter = createTRPCRouter({
         })),
       }));
   }),
+
+  getProject: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string().ulid(),
+        organizationId: z.string().uuid(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      return ctx.db.query.projects.findFirst({
+        where: and(
+          eq(projects.identifier, input.projectId),
+          eq(projects.organizationId, input.organizationId)
+        ),
+        columns: {
+          createdAt: true,
+          description: true,
+          identifier: true,
+          logo: true,
+          name: true,
+          updatedAt: true,
+          id: true,
+        },
+      });
+    }),
+
+  getProjectMembers: protectedProcedure
+    .input(z.object({ projectId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const members = await ctx.db.query.projectMembers.findMany({
+        where: eq(projectMembers.projectId, input.projectId),
+        with: {
+          user: true,
+        },
+      });
+
+      return members.map((member) => ({
+        name: member.user.name,
+        role: member.role,
+        image: member.user.image,
+        email: member.user.email,
+      }));
+    }),
 });
