@@ -3,7 +3,8 @@
 import { useState } from "react";
 
 import { Table } from "@tanstack/react-table";
-import { X } from "lucide-react";
+import { useSelector } from "@xstate/store/react";
+import { LayoutGridIcon, LogsIcon, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+import { cn } from "@/lib/utils";
+import projectStyleStore from "@/store/project";
 
 import NewProjectDialog from "./new-project-dialog";
 
@@ -26,6 +30,11 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   "use no memo";
   const [sortValue, setSortValue] = useState<string>("");
+
+  const showState = useSelector(
+    projectStyleStore,
+    (state) => state.context.style
+  );
 
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -71,6 +80,33 @@ export function DataTableToolbar<TData>({
           <SelectItem value="updatedAt">Sort by Last Updated</SelectItem>
         </SelectContent>
       </Select>
+
+      <div className="bg-muted text-muted-foreground flex gap-0.5 rounded-md p-0.5">
+        <Button
+          className={cn(
+            "size-8",
+            showState === "grid" &&
+              "bg-background text-foreground hover:bg-background hover:text-foreground focus:bg-background focus:text-foreground"
+          )}
+          variant="ghost"
+          size="icon"
+          onClick={() => projectStyleStore.trigger.showAsGrid()}
+        >
+          <LayoutGridIcon />
+        </Button>
+        <Button
+          className={cn(
+            "size-8",
+            showState === "list" &&
+              "bg-background text-foreground hover:bg-background hover:text-foreground focus:bg-background focus:text-foreground"
+          )}
+          variant="ghost"
+          size="icon"
+          onClick={() => projectStyleStore.trigger.showAsList()}
+        >
+          <LogsIcon />
+        </Button>
+      </div>
 
       <NewProjectDialog />
     </div>

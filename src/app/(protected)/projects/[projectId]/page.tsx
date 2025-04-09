@@ -1,3 +1,9 @@
-export default function SingleProjectPage({}) {
-  return <div>Hello,</div>;
+interface SingleProjectPageProps {
+  params: {
+    projectId: string;
+  };
+}
+
+export default function SingleProjectPage({ params }: SingleProjectPageProps) {
+  return <div>Hello, {params.projectId}</div>;
 }

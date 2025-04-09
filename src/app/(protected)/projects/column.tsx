@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 
@@ -24,6 +26,7 @@ export const columns: ColumnDef<TProjects>[] = [
         ?.split(" ")
         .map((i) => i.charAt(0).toUpperCase())
         .join("");
+      const identifier = row.original.identifier || "";
 
       return (
         <div className="flex items-center gap-2">
@@ -34,7 +37,9 @@ export const columns: ColumnDef<TProjects>[] = [
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span>{row.getValue("name")}</span>
+            <Link href={`/projects/${identifier}`}>
+              <span>{row.getValue("name")}</span>
+            </Link>
           </div>
         </div>
       );
