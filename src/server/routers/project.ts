@@ -144,6 +144,23 @@ export const projectsRouter = createTRPCRouter({
           updatedAt: true,
           id: true,
         },
+        with: {
+          members: {
+            where: eq(projectMembers.role, "manager"),
+            columns: {
+              role: true,
+            },
+            with: {
+              user: {
+                columns: {
+                  email: true,
+                  image: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
       });
     }),
 
