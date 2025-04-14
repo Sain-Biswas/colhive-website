@@ -4,6 +4,7 @@ import { ulid } from "ulid";
 
 import { organizations } from "./organizations";
 import { projectMembers } from "./project-members";
+import { projectTasks } from "./project-tasks";
 import { teams } from "./teams";
 
 export const projects = sqliteTable("projects", {
@@ -34,4 +35,5 @@ export const projectRelations = relations(projects, ({ one, many }) => ({
   }),
   members: many(projectMembers),
   teams: many(teams),
+  tasks: many(projectTasks),
 }));
