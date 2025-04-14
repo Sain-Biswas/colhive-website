@@ -9,7 +9,9 @@ import {
   UsersIcon,
 } from "lucide-react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const stats = [
   { id: 1, name: "Projects Managed", value: "10,000+" },
@@ -55,6 +57,36 @@ const steps = [
   },
 ];
 
+const testimonials = [
+  {
+    body: "ColHive has transformed the way our team manages projects. It's intuitive, powerful, and incredibly flexible.",
+    author: {
+      name: "Leslie Alexander",
+      handle: "lesliealexander",
+      imageUrl: "/placeholder.svg",
+      role: "Co-Founder / CEO",
+    },
+  },
+  {
+    body: "The hierarchical approach in ColHive makes it easy to break down complex projects into manageable tasks. A game-changer for our workflow.",
+    author: {
+      name: "Michael Foster",
+      handle: "michaelfoster",
+      imageUrl: "/placeholder.svg",
+      role: "Product Manager",
+    },
+  },
+  {
+    body: "I love how ColHive combines simplicity with powerful features. It's perfect for both tech-savvy users and those new to project management tools.",
+    author: {
+      name: "Dries Vincent",
+      handle: "driesvincent",
+      imageUrl: "/placeholder.svg",
+      role: "Team Lead",
+    },
+  },
+];
+
 export default function Home() {
   return (
     <main>
@@ -66,9 +98,9 @@ export default function Home() {
                 Streamline Your Projects, Empower Your Teams
               </h1>
               <p className="mt-6 text-lg">
-                ColHive's unique hierarchical approach revolutionizes project
-                management, making collaboration seamless and intuitive for
-                teams of all sizes.
+                ColHive&apos;s unique hierarchical approach revolutionizes
+                project management, making collaboration seamless and intuitive
+                for teams of all sizes.
               </p>
               <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
                 <Button className="rounded-xl p-6 shadow-sm">
@@ -186,8 +218,8 @@ export default function Home() {
               Simple steps to project success
             </p>
             <p className="text-muted-foreground mt-6 text-lg leading-8">
-              ColHive's intuitive process makes project management a breeze.
-              Follow these steps to achieve your goals efficiently.
+              ColHive&apos;s intuitive process makes project management a
+              breeze. Follow these steps to achieve your goals efficiently.
             </p>
           </div>
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -215,6 +247,42 @@ export default function Home() {
               height={450}
               className="rounded-xl shadow-2xl"
             />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-background py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-xl text-center">
+            <h2 className="text-primary text-lg leading-8 font-semibold tracking-tight">
+              Testimonials
+            </h2>
+            <p className="text-foreground mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+              Loved by teams everywhere
+            </p>
+          </div>
+
+          <div className="mt-6 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+            {testimonials.map((testimonial, testimonialIdx) => (
+              <Card key={testimonialIdx} className="sm:px-4">
+                <CardContent className="italic">{testimonial.body}</CardContent>
+                <CardFooter className="mt-6 flex gap-3">
+                  <Avatar className="size-10">
+                    <AvatarImage src={testimonial.author.imageUrl} />
+                    <AvatarFallback className="size-10">
+                      {testimonial.author.name
+                        ?.split(" ")
+                        .map((i) => i.charAt(0).toUpperCase())
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col items-start justify-center">
+                    <p className="font-bold">{testimonial.author.name}</p>
+                    <p className="text-sm">@{testimonial.author.handle}</p>
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
