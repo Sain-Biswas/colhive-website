@@ -1,7 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { ArrowRightIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  BellIcon,
+  CheckCircleIcon,
+  LayoutIcon,
+  UsersIcon,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -10,6 +16,33 @@ const stats = [
   { id: 2, name: "Teams Empowered", value: "5,000+" },
   { id: 3, name: "Tasks Completed", value: "1M+" },
   { id: 4, name: "Time Saved", value: "1000+ hours" },
+];
+
+const features = [
+  {
+    name: "Task Management",
+    description:
+      "Organize and prioritize tasks with ease using our intuitive interface.",
+    icon: CheckCircleIcon,
+  },
+  {
+    name: "Team Collaboration",
+    description:
+      "Foster seamless communication and cooperation within your team.",
+    icon: UsersIcon,
+  },
+  {
+    name: "Customizable Workspaces",
+    description:
+      "Tailor your workspace to fit your unique project management needs.",
+    icon: LayoutIcon,
+  },
+  {
+    name: "Real-time Notifications",
+    description:
+      "Stay updated with instant alerts on project changes and updates.",
+    icon: BellIcon,
+  },
 ];
 
 export default function Home() {
@@ -84,6 +117,48 @@ export default function Home() {
                   </dt>
                   <dd className="text-muted-foreground order-first text-3xl font-semibold tracking-tight">
                     {stat.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+      <section className="bg-background py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl lg:text-center">
+            <h2 className="text-primary text-base leading-7 font-semibold">
+              Powerful Features
+            </h2>
+            <p className="text-foreground mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+              Everything you need to manage your projects
+            </p>
+            <p className="text-muted-foreground mt-6 text-lg leading-8">
+              ColHive provides a comprehensive set of tools to streamline your
+              project management process and boost team productivity.
+            </p>
+          </div>
+          <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+            <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
+              {features.map((feature) => (
+                <div key={feature.name} className="flex flex-col">
+                  <dt className="text-muted-foreground flex items-center gap-x-3 text-base leading-7 font-semibold">
+                    <feature.icon
+                      className="text-primary h-5 w-5 flex-none"
+                      aria-hidden="true"
+                    />
+                    {feature.name}
+                  </dt>
+                  <dd className="text-muted-foreground mt-4 flex flex-auto flex-col text-base leading-7">
+                    <p className="flex-auto">{feature.description}</p>
+                    <p className="mt-6">
+                      <a
+                        href="#"
+                        className="text-primary text-sm leading-6 font-semibold"
+                      >
+                        Learn more <span aria-hidden="true">→</span>
+                      </a>
+                    </p>
                   </dd>
                 </div>
               ))}
