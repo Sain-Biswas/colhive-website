@@ -5,6 +5,13 @@ import { ArrowRightIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
+const stats = [
+  { id: 1, name: "Projects Managed", value: "10,000+" },
+  { id: 2, name: "Teams Empowered", value: "5,000+" },
+  { id: 3, name: "Tasks Completed", value: "1M+" },
+  { id: 4, name: "Time Saved", value: "1000+ hours" },
+];
+
 export default function Home() {
   return (
     <main>
@@ -23,7 +30,7 @@ export default function Home() {
               <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
                 <Button className="rounded-xl p-6 shadow-sm">
                   <Link
-                    href="#"
+                    href="/dashboard"
                     className="inline-flex items-center justify-center text-sm font-semibold"
                   >
                     Dashboard
@@ -51,6 +58,36 @@ export default function Home() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      <section className="bg-secondary py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl lg:max-w-none">
+            <div className="text-center">
+              <h2 className="text-secondary-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                Trusted by teams worldwide
+              </h2>
+              <p className="text-muted-foreground mt-4 text-lg leading-8">
+                ColHive has helped thousands of teams achieve their project
+                goals efficiently.
+              </p>
+            </div>
+            <dl className="mt-16 grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-4">
+              {stats.map((stat) => (
+                <div
+                  key={stat.id}
+                  className="bg-background/50 flex flex-col p-8"
+                >
+                  <dt className="text-foreground text-sm leading-6 font-semibold">
+                    {stat.name}
+                  </dt>
+                  <dd className="text-muted-foreground order-first text-3xl font-semibold tracking-tight">
+                    {stat.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
       </section>
