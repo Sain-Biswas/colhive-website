@@ -45,6 +45,16 @@ const features = [
   },
 ];
 
+const steps = [
+  { name: "Create", description: "Set up your project and define your goals" },
+  { name: "Collaborate", description: "Invite team members and assign tasks" },
+  { name: "Track", description: "Monitor progress and adjust as needed" },
+  {
+    name: "Succeed",
+    description: "Complete projects on time and within budget",
+  },
+];
+
 export default function Home() {
   return (
     <main>
@@ -163,6 +173,48 @@ export default function Home() {
                 </div>
               ))}
             </dl>
+          </div>
+        </div>
+      </section>
+      <section className="bg-secondary py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl lg:text-center">
+            <h2 className="text-primary text-base leading-7 font-semibold">
+              How It Works
+            </h2>
+            <p className="text-secondary-foreground mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+              Simple steps to project success
+            </p>
+            <p className="text-muted-foreground mt-6 text-lg leading-8">
+              ColHive's intuitive process makes project management a breeze.
+              Follow these steps to achieve your goals efficiently.
+            </p>
+          </div>
+          <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+            <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
+              {steps.map((step, index) => (
+                <div key={step.name} className="flex flex-col items-center">
+                  <dt className="text-primary flex items-center gap-x-3 text-base leading-7 font-semibold">
+                    <div className="bg-primary text-primary-foreground flex h-12 w-12 items-center justify-center rounded-full">
+                      {index + 1}
+                    </div>
+                    {step.name}
+                  </dt>
+                  <dd className="text-muted-foreground mt-4 flex flex-auto flex-col text-center text-base leading-7">
+                    <p className="flex-auto">{step.description}</p>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <div className="mt-16 flex justify-center">
+            <Image
+              src="/placeholder.svg"
+              alt="ColHive Dashboard"
+              width={800}
+              height={450}
+              className="rounded-xl shadow-2xl"
+            />
           </div>
         </div>
       </section>
