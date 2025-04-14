@@ -17,7 +17,7 @@ export default async function Page({
   });
 
   return (
-    <main>
+    <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
       <ProjectDetails
         organizationId={organization?.id || ""}
         projectId={projectId}
