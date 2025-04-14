@@ -1,6 +1,7 @@
 import { api } from "@/trpc/server";
 
 import ProjectDetails from "./components/project-details";
+import ProjectHeader from "./components/project-header";
 
 export default async function Page({
   params,
@@ -17,11 +18,17 @@ export default async function Page({
   });
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <ProjectDetails
+    <>
+      <ProjectHeader
         organizationId={organization?.id || ""}
         projectId={projectId}
       />
-    </main>
+      <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <ProjectDetails
+          organizationId={organization?.id || ""}
+          projectId={projectId}
+        />
+      </main>
+    </>
   );
 }
