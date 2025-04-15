@@ -1,7 +1,13 @@
+import { TRPCError } from "@trpc/server";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
-import { projectMembers, projects, users } from "@/database/schema";
+import {
+  projectMembers,
+  projectTasks,
+  projects,
+  users,
+} from "@/database/schema";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc";
 
 export const projectsRouter = createTRPCRouter({
@@ -126,14 +132,19 @@ export const projectsRouter = createTRPCRouter({
     .input(
       z.object({
         projectId: z.string().ulid(),
-        organizationId: z.string().uuid(),
       })
     )
     .query(async ({ ctx, input }) => {
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+        columns: {
+          activeOrganization: true,
+        },
+      });
       return ctx.db.query.projects.findFirst({
         where: and(
           eq(projects.identifier, input.projectId),
-          eq(projects.organizationId, input.organizationId)
+          eq(projects.organizationId, user?.activeOrganization || "")
         ),
         columns: {
           createdAt: true,
@@ -165,7 +176,7 @@ export const projectsRouter = createTRPCRouter({
     }),
 
   getProjectMembers: protectedProcedure
-    .input(z.object({ projectId: z.string().uuid() }))
+    .input(z.object({ projectId: z.string() }))
     .query(async ({ ctx, input }) => {
       const members = await ctx.db.query.projectMembers.findMany({
         where: eq(projectMembers.projectId, input.projectId),
@@ -180,5 +191,126 @@ export const projectsRouter = createTRPCRouter({
         image: member.user.image,
         email: member.user.email,
       }));
+    }),
+
+  createNewTask: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string().uuid(),
+        userId: z.string().uuid(),
+        tag: z.enum([
+          "documentation",
+          "bug",
+          "fix",
+          "feature",
+          "chore",
+          "refactor",
+          "build",
+          "test",
+        ]),
+        status: z.enum(["backlog", "todo", "in-progress", "done", "canceled"]),
+        priority: z.enum(["high", "medium", "high"]),
+        title: z.string().trim(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const [user, project] = await Promise.all([
+        ctx.db.query.users.findFirst({
+          where: eq(users.id, ctx.session.user.id),
+          columns: {
+            id: true,
+            activeOrganization: true,
+          },
+        }),
+        ctx.db.query.projects.findFirst({
+          where: eq(projects.identifier, input.projectId),
+          columns: {
+            id: true,
+          },
+        }),
+      ]);
+
+      if (!user || !project) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "No user found",
+        });
+      }
+
+      await ctx.db.insert(projectTasks).values({
+        projectId: project.id,
+        assignedBy: user.id,
+        organizationId: user?.activeOrganization || "",
+        priority: input.priority,
+        status: input.status,
+        tag: input.tag,
+        title: input.title,
+        userId: input.userId,
+      });
+    }),
+
+  getOrganizationTasks: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string().ulid(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const [user, project] = await Promise.all([
+        ctx.db.query.users.findFirst({
+          where: eq(users.id, ctx.session.user.id),
+          columns: {
+            id: true,
+            activeOrganization: true,
+          },
+        }),
+        ctx.db.query.projects.findFirst({
+          where: eq(projects.identifier, input.projectId),
+          columns: {
+            id: true,
+          },
+        }),
+      ]);
+
+      if (!user || !project) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User or Project not found.",
+        });
+      }
+
+      return await ctx.db.query.projectTasks.findMany({
+        where: and(
+          eq(projectTasks.organizationId, user.activeOrganization || ""),
+          eq(projectTasks.projectId, project.id)
+        ),
+        columns: {
+          identifier: true,
+          priority: true,
+          status: true,
+          title: true,
+          tag: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        with: {
+          user: {
+            columns: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+          assignedBy: {
+            columns: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+      });
     }),
 });

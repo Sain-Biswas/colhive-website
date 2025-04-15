@@ -1,7 +1,8 @@
-import { api } from "@/trpc/server";
+import { HydrateClient, api } from "@/trpc/server";
 
 import ProjectDetails from "./components/project-details";
 import ProjectHeader from "./components/project-header";
+import NewProjectTaskDialog from "./components/tasks/new-task-dialog";
 
 export default async function Page({
   params,
@@ -10,25 +11,21 @@ export default async function Page({
 }) {
   const { projectId } = await params;
 
-  const organization = await api.organizations.getActiveOrganization.call({});
-
   void api.projects.getProject.prefetch({
     projectId,
-    organizationId: organization?.id || "",
+  });
+
+  void api.projects.getProjectMembers.prefetch({
+    projectId,
   });
 
   return (
-    <>
-      <ProjectHeader
-        organizationId={organization?.id || ""}
-        projectId={projectId}
-      />
+    <HydrateClient>
+      <ProjectHeader projectId={projectId} />
       <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <ProjectDetails
-          organizationId={organization?.id || ""}
-          projectId={projectId}
-        />
+        <ProjectDetails projectId={projectId} />
+        <NewProjectTaskDialog projectId={projectId} />
       </main>
-    </>
+    </HydrateClient>
   );
 }

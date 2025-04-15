@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { ulid } from "ulid";
 
 import { organizations } from "./organizations";
@@ -40,6 +40,12 @@ export const projectTasks = sqliteTable("project-tasks", {
   }).notNull(),
   priority: text("priority", { enum: ["high", "medium", "high"] }).notNull(),
   title: text("title").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
+    () => new Date()
+  ),
+  updatedAt: integer("updatedAt", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
+    .$onUpdateFn(() => new Date()),
 });
 
 export const projectTasksRelations = relations(projectTasks, ({ one }) => ({

@@ -14,16 +14,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { api } from "@/trpc/trpc-react-provider";
 
 interface ProjectHeaderProps {
-  organizationId: string;
   projectId: string;
 }
 
-export default function ProjectHeader({
-  organizationId,
-  projectId,
-}: ProjectHeaderProps) {
+export default function ProjectHeader({ projectId }: ProjectHeaderProps) {
   const [project] = api.projects.getProject.useSuspenseQuery({
-    organizationId,
     projectId,
   });
 

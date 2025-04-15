@@ -14,16 +14,11 @@ import { api } from "@/trpc/trpc-react-provider";
 import ProjectMembers from "./project-members";
 
 interface ProjectDetailsProps {
-  organizationId: string;
   projectId: string;
 }
 
-export default function ProjectDetails({
-  organizationId,
-  projectId,
-}: ProjectDetailsProps) {
+export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
   const [project] = api.projects.getProject.useSuspenseQuery({
-    organizationId,
     projectId,
   });
 
