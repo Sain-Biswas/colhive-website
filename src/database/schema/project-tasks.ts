@@ -38,7 +38,7 @@ export const projectTasks = sqliteTable("project-tasks", {
   status: text("status", {
     enum: ["backlog", "todo", "in-progress", "done", "canceled"],
   }).notNull(),
-  priority: text("priority", { enum: ["high", "medium", "high"] }).notNull(),
+  priority: text("priority", { enum: ["low", "medium", "high"] }).notNull(),
   title: text("title").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()

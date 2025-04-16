@@ -46,8 +46,6 @@ export function TeamSwitcher() {
 
   const { activeOrganization, listOrganization } = data;
 
-  console.log(listOrganization);
-
   useEffect(() => {
     if (!path.includes("/new-organization") && !path.includes("/invitations")) {
       if (!!!activeOrganization) {

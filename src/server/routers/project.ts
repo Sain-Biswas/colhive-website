@@ -209,7 +209,7 @@ export const projectsRouter = createTRPCRouter({
           "test",
         ]),
         status: z.enum(["backlog", "todo", "in-progress", "done", "canceled"]),
-        priority: z.enum(["high", "medium", "high"]),
+        priority: z.enum(["low", "medium", "high"]),
         title: z.string().trim(),
       })
     )
